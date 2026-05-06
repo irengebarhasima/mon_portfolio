@@ -1,0 +1,14 @@
+<h1>Contactez-moi</h1>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Envoyer</button>
+</form>
+
+{% if messages %}
+  <ul>
+    {% for message in messages %}
+      <li style="color:green">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}

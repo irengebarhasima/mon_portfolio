@@ -1,0 +1,11 @@
+<h1>Mes services professionnels</h1>
+<ul>
+  {% for service in services %}
+    <li>
+      <strong>{{ service.name }}</strong><br>
+      {{ service.description }}<br>
+      <em>{{ service.price }}</em>
+    </li>
+  {% endfor %}
+</ul>
+<p><a href="{% url 'contact' %}">Demander un devis →</a></p>

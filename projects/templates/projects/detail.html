@@ -1,0 +1,143 @@
+{% extends "core/base.html" %}
+
+{% block title %}{{ project.title }} - Mon Portfolio{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Bouton retour -->
+    <div class="mb-3">
+        <a href="{% url 'project_list' %}" class="btn btn-secondary btn-sm">← Retour aux projets</a>
+    </div>
+    
+    <!-- Détails du projet -->
+    <div class="card">
+        {% if project.image_url %}
+            <img src="{{ project.image_url }}" class="card-img-top" alt="{{ project.title }}">
+        {% endif %}
+        <div class="card-body">
+            <h1 class="card-title">{{ project.title }}</h1>
+            <p class="card-text">{{ project.description }}</p>
+            <p><strong>Technologies :</strong> {{ project.technologies }}</p>
+            <p><small class="text-muted">Publié le : {{ project.created_at|date:"d/m/Y" }}</small></p>
+            
+            <!-- Affichage de la note moyenne (étoiles) -->
+            <div class="rating-display mb-3">
+                <strong>Note moyenne :</strong>
+                {% for i in full_stars %}★{% endfor %}
+                {% if half_star %}½{% endif %}
+                {% for i in empty_stars %}☆{% endfor %}
+                <span class="text-muted">({{ project.total_ratings }} évaluation{{ project.total_ratings|pluralize }})</span>
+            </div>
+            
+            <!-- Likes -->
+            <div class="like-section mb-3">
+                <a href="{% url 'toggle_like_simple' project.id %}" class="btn btn-sm btn-outline-danger">
+                    ❤️ Like <span class="like-count">{{ project.likes.count }}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ================================================== -->
+    <!-- SECTION ÉVALUATION (NOTES)                        -->
+    <!-- ================================================== -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Évaluer ce projet</h3>
+        </div>
+        <div class="card-body">
+            <form method="post" action="{% url 'rate_project' project.id %}" class="rating-form">
+                {% csrf_token %}
+                <div class="star-rating mb-3">
+                    <label>Note :</label>
+                    <div class="stars">
+                        {% for i in "12345"|make_list %}
+                            <button type="submit" name="rating" value="{{ i }}" class="star-btn" data-value="{{ i }}">
+                                ☆
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <p class="text-muted small">Cliquez sur une étoile pour noter (1 = mauvais, 5 = excellent)</p>
+            </form>
+            
+            <div id="rating-feedback" class="alert alert-info d-none"></div>
+        </div>
+    </div>
+    
+    <!-- ================================================== -->
+    <!-- SECTION COMMENTAIRES                               -->
+    <!-- ================================================== -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h3>Commentaires ({{ project.comments.count }})</h3>
+        </div>
+        <div class="card-body">
+            <div class="comments-list">
+                {% for comment in project.comments.all %}
+                    <div class="border-bottom mb-3 pb-2" id="comment-{{ comment.id }}">
+                        <strong>{{ comment.author_name }}</strong>
+                        <span class="text-muted small">- {{ comment.created_at|date:"d/m/Y H:i" }}</span>
+                        <p class="mt-1">{{ comment.content }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">Aucun commentaire pour le moment. Soyez le premier !</p>
+                {% endfor %}
+            </div>
+            
+            <!-- Formulaire d'ajout de commentaire -->
+            <div class="mt-4">
+                <h5>Laisser un commentaire</h5>
+                <form method="post" action="{% url 'add_comment_simple' 'project' project.id %}">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <input type="text" name="author_name" class="form-control" placeholder="Votre nom" required>
+                    </div>
+                    <div class="mb-2">
+                        <input type="email" name="author_email" class="form-control" placeholder="Votre email" required>
+                    </div>
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Votre commentaire..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Envoyer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Style pour les étoiles */
+.stars {
+    display: inline-flex;
+    gap: 10px;
+}
+.star-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #ffc107;
+    transition: transform 0.2s;
+}
+.star-btn:hover {
+    transform: scale(1.2);
+}
+.star-btn[data-value="1"]:hover { color: #ff4444; }
+.star-btn[data-value="2"]:hover { color: #ff8844; }
+.star-btn[data-value="3"]:hover { color: #ffcc44; }
+.star-btn[data-value="4"]:hover { color: #ffee44; }
+.star-btn[data-value="5"]:hover { color: #44ff44; }
+</style>
+
+<style>
+/* Style pour les étoiles d'affichage */
+.rating-display {
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+}
+.rating-display span {
+    font-size: 0.9rem;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,202 @@
+{% extends "core/base.html" %}
+
+{% block title %}Mes projets{% endblock %}
+
+{% block content %}
+
+<!-- Barre de recherche -->
+<div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+        <form method="get" action="{% url 'project_list' %}" class="d-flex">
+            <input type="text" name="q" class="form-control me-2" 
+                   placeholder="Rechercher un projet..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search"></i> Rechercher
+            </button>
+        </form>
+    </div>
+</div>
+
+{% if query %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i> Résultats pour : "{{ query }}"
+    </div>
+{% endif %}
+
+<h1 class="mb-4">Mes projets</h1>
+
+<div class="row">
+    {% for project in projects %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            {% if project.image_url %}
+            <img src="{{ project.image_url }}" class="card-img-top" alt="{{ project.title }}">
+            {% endif %}
+            <div class="card-body">
+                <!-- Lien vers la page de détail -->
+                <a href="{% url 'project_detail' project.id %}" style="text-decoration: none; color: inherit;">
+                    <h2 class="card-title h5">{{ project.title }}</h2>
+                </a>
+
+                <p class="card-text">
+                    {{ project.description }}
+                </p>
+                <p class="card-text">
+                    <small class="text-muted">Technologies : {{ project.technologies }}</small>
+                </p>
+
+                <!-- Section Likes -->
+                <div class="like-section mb-3" data-object-id="{{ project.id }}" data-model="project">
+                    <a href="{% url 'toggle_like_simple' project.id %}" class="like-btn btn btn-sm btn-outline-danger">
+                        ❤️ Like <span class="like-count">{{ project.likes.count }}</span>
+                    </a>
+                </div>
+
+                <!-- Affichage de la note moyenne (étoiles) -->
+                <div class="mb-2">
+                    {% with avg=project.average_rating %}
+                        <div class="stars">
+                            {% for i in "12345"|make_list %}
+                                {% if forloop.counter <= avg %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% elif forloop.counter <= avg|add:0.5 %}
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted small">({{ project.total_ratings }} note{{ project.total_ratings|pluralize }})</span>
+                        </div>
+                    {% endwith %}
+                </div>
+
+                <!-- Section Commentaires existants -->
+                <div class="comments-section mt-3">
+                    <h6>Commentaires ({{ project.comments.count }})</h6>
+                    <div class="comments-list">
+                        {% for comment in project.comments.all %}
+                        <div class="card mb-2" id="comment-{{ comment.id }}">
+                            <div class="card-body py-2">
+                                <strong>{{ comment.author_name }}</strong>
+                                <span class="text-muted small">- {{ comment.created_at|date:"d/m/Y H:i" }}</span>
+                                <p class="mt-1 mb-0">
+                                    {{ comment.content }}
+                                </p>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted no-comment">
+                            Aucun commentaire. Soyez le premier !
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Formulaire pour ajouter un commentaire -->
+                <div class="comment-form-simple mt-3">
+                    <h6>Laisser un commentaire</h6>
+                    <form method="post" action="{% url 'add_comment_simple' 'project' project.id %}">
+                        {% csrf_token %}
+                        <div class="mb-2">
+                            <input type="text" name="author_name" class="form-control form-control-sm" placeholder="Votre nom" required>
+                        </div>
+                        <div class="mb-2">
+                            <input type="email" name="author_email" class="form-control form-control-sm" placeholder="Votre email" required>
+                        </div>
+                        <div class="mb-2">
+                            <textarea name="content" class="form-control form-control-sm" rows="2" placeholder="Votre commentaire..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center">
+        <p class="text-muted">Aucun projet trouvé.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if projects.has_other_pages %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if projects.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}">
+                <i class="fas fa-angle-double-left"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ projects.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                <i class="fas fa-angle-left"></i>
+            </a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">{{ projects.number }} / {{ projects.paginator.num_pages }}</span>
+        </li>
+
+        {% if projects.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ projects.next_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                <i class="fas fa-angle-right"></i>
+            </a>
+        </li>
+        <li class="page-item">
+            <a class="page-link" href="?page={{ projects.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}">
+                <i class="fas fa-angle-double-right"></i>
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Récupération du token CSRF
+    let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Gestion des likes (AJAX)
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            const container = this.closest('.like-section');
+            const objectId = container.dataset.objectId;
+            const model = container.dataset.model;
+
+            fetch('/api/like/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify({
+                    model: model,
+                    object_id: objectId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const countSpan = this.querySelector('.like-count');
+                countSpan.textContent = data.count;
+                if (data.liked) {
+                    this.classList.remove('btn-outline-danger');
+                    this.classList.add('btn-danger');
+                } else {
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-outline-danger');
+                }
+            })
+            .catch(error => console.error('Erreur Like:', error));
+        });
+    });
+</script>
+{% endblock %}

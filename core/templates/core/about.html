@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>À propos - Daniel Irenge</title>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'home' %}">Accueil</a> |
+        <a href="{% url 'about' %}">À propos</a> |
+        <a href="{% url 'project_list' %}">Projets</a> |
+        <a href="{% url 'service_list' %}">Services</a> |
+        <a href="{% url 'contact' %}">Contact</a>
+    </nav>
+    
+    <h1>À propos de moi</h1>
+    <div>{{ about_text|safe }}</div>  <!-- safe permet d'interpréter le HTML -->
+    
+    <h2>Compétences techniques</h2>
+    <div>{{ skills|safe }}</div>
+</body>
+</html>
