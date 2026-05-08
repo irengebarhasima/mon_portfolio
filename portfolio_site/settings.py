@@ -12,9 +12,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-t5c6l^ilp@4fi9pi@h&(p6t03h5g2&hwckiaqoe*600@viaphd'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+# Pour développement local
+#DEBUG = False
+#ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
-#ALLOWED_HOSTS = ['*']
+# Pour production (décommentez quand vous déployez)
+DEBUG = False
+ALLOWED_HOSTS = [
+     'techbridgesolutionibd.onrender.com',
+     '.onrender.com',  # Accepte tous les sous-domaines render.com
+     'localhost',
+     '127.0.0.1',
+ ]
 
 # Application definition
 INSTALLED_APPS = [
