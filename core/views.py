@@ -15,6 +15,10 @@ from projects.models import Project
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib.contenttypes.models import ContentType
 from .models import Rating
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+
 
 
 def home(request):
@@ -83,6 +87,62 @@ def toggle_like_simple(request, project_id):
     return redirect(request.META.get('HTTP_REFERER', 'project_list'))
     
     
+    
+# Ajoutez ces imports en haut de core/views.py
+import json
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
+from projects.models import Project
+
+# Ajoutez cette fonction à la fin de core/views.py
+@require_POST
+@csrf_exempt
+def api_toggle_like(request):
+    """API AJAX pour gérer les likes"""
+    try:
+        data = json.loads(request.body)
+        model_name = data.get('model')
+        object_id = data.get('object_id')
+        
+        if model_name == 'project':
+            obj = get_object_or_404(Project, id=object_id)
+            content_type = ContentType.objects.get_for_model(Project)
+        else:
+            return JsonResponse({'error': 'Modèle non supporté'}, status=400)
+        
+        # Gestion de la session
+        if not request.session.session_key:
+            request.session.create()
+        session_key = request.session.session_key
+        
+        # Chercher ou créer le like
+        like, created = Like.objects.get_or_create(
+            content_type=content_type,
+            object_id=object_id,
+            session_key=session_key
+        )
+        
+        if not created:
+            like.delete()
+            liked = False
+        else:
+            liked = True
+        
+        # Compter les likes
+        like_count = Like.objects.filter(
+            content_type=content_type,
+            object_id=object_id
+        ).count()
+        
+        return JsonResponse({
+            'liked': liked,
+            'count': like_count
+        })
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+        
 # ==================================================
 # VUE POUR GÉRER LES NOTES (ÉVALUATIONS)
 # ==================================================

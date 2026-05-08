@@ -1,11 +1,482 @@
-<h1>Mes services professionnels</h1>
-<ul>
-  {% for service in services %}
-    <li>
-      <strong>{{ service.name }}</strong><br>
-      {{ service.description }}<br>
-      <em>{{ service.price }}</em>
-    </li>
-  {% endfor %}
-</ul>
-<p><a href="{% url 'contact' %}">Demander un devis →</a></p>
+{% extends "core/base.html" %}
+
+{% block title %}Services - Daniel Irenge{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   SERVICES PAGE
+================================================================ */
+.services-hero {
+    padding: 60px 0 40px;
+    text-align: center;
+}
+
+/* Service cards grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
+    margin: 50px 0 70px;
+}
+
+.service-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 36px 28px;
+    transition: all 0.35s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+    transform: scaleX(0);
+    transition: transform 0.4s ease;
+}
+
+.service-card:hover {
+    border-color: rgba(0,212,255,0.25);
+    transform: translateY(-8px);
+}
+
+.service-card:hover::before { transform: scaleX(1); }
+
+.service-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.service-icon i {
+    font-size: 2rem;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.service-card h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+}
+
+.service-card p {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+}
+
+/* Feature list */
+.feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.feature-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.feature-list li:last-child { border-bottom: none; }
+
+.feature-list li i {
+    width: 20px;
+    color: var(--cyan);
+    font-size: 0.75rem;
+}
+
+.service-price {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cyan);
+}
+
+.price small {
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--muted);
+}
+
+/* Process section */
+.process-section {
+    margin: 80px 0;
+    padding: 60px 0;
+    position: relative;
+}
+
+.process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 50px;
+}
+
+@media (max-width: 768px) {
+    .process-steps { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 480px) {
+    .process-steps { grid-template-columns: 1fr; }
+}
+
+.step {
+    text-align: center;
+    padding: 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    position: relative;
+}
+
+.step-num {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0 auto 20px;
+}
+
+.step h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.step p {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+/* FAQ section */
+.faq-section {
+    margin: 60px 0 40px;
+}
+
+.faq-grid {
+    max-width: 800px;
+    margin: 40px auto 0;
+}
+
+.faq-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.faq-question {
+    padding: 20px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text);
+    transition: background 0.2s;
+}
+
+.faq-question:hover {
+    background: rgba(0,212,255,0.03);
+}
+
+.faq-question i {
+    color: var(--cyan);
+    transition: transform 0.3s;
+}
+
+.faq-item.open .faq-question i {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    padding: 0 24px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.7;
+}
+
+.faq-item.open .faq-answer {
+    padding: 0 24px 20px 24px;
+    max-height: 300px;
+}
+
+/* CTA Banner inside services */
+.services-cta {
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.08));
+    border-radius: 32px;
+    padding: 60px 40px;
+    text-align: center;
+    margin: 60px 0 40px;
+    border: 1px solid rgba(0,212,255,0.1);
+}
+
+/* Tech stack icons */
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.tech-tag {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 30px;
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    color: var(--cyan);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <!-- Hero -->
+    <section class="services-hero">
+        <div class="reveal">
+            <div class="section-label" style="justify-content: center;">03. Services</div>
+            <h1 class="section-heading">
+                Ce que je <span class="hi">propose</span>
+            </h1>
+            <p style="color: var(--muted); max-width: 560px; margin: 16px auto 0;">
+                Des solutions sur mesure en développement web, infrastructure réseau et conseil technique.
+                Chaque projet est une opportunité de créer de la valeur.
+            </p>
+        </div>
+    </section>
+
+    <!-- Services grid -->
+    <div class="services-grid">
+        {% for service in services %}
+        <div class="service-card reveal delay-{{ forloop.counter|default:1 }}">
+            <div class="service-icon">
+                {% if service.icon %}
+                    <i class="{{ service.icon }}"></i>
+                {% else %}
+                    <i class="fas fa-cogs"></i>
+                {% endif %}
+            </div>
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.description|truncatewords:30 }}</p>
+
+            {% if service.features %}
+            <ul class="feature-list">
+                {% for feature in service.features_list %}
+                    <li><i class="fas fa-check-circle"></i> {{ feature }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {% if service.tech_stack %}
+            <div class="tech-stack">
+                {% for tech in service.tech_stack_list %}
+                    <span class="tech-tag">{{ tech }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="service-price">
+                <span class="price">
+                    {% if service.price %}
+                        {{ service.price }}
+                    {% else %}
+                        Sur devis
+                    {% endif %}
+                    <small>{% if service.price_unit %}/{{ service.price_unit }}{% endif %}</small>
+                </span>
+                <a href="{% url 'contact' %}?service={{ service.id }}" class="btn-neon ghost" style="padding: 8px 18px; font-size: 0.8rem;">
+                    <i class="fas fa-arrow-right"></i> Demander
+                </a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center" style="grid-column: 1/-1;">
+            <div style="max-width: 400px; margin: 40px auto;">
+                <i class="fas fa-tools" style="font-size: 3rem; color: rgba(0,212,255,0.3); margin-bottom: 20px;"></i>
+                <p style="color: var(--muted);">La liste des services est en cours d'actualisation.</p>
+                <a href="{% url 'contact' %}" class="btn-neon ghost">Me contacter pour une offre personnalisée</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Process section -->
+    <div class="process-section">
+        <div class="text-center reveal">
+            <div class="section-label" style="justify-content: center;">Méthodologie</div>
+            <h2 class="section-heading">
+                Comment je <span class="hi">travaille</span>
+            </h2>
+            <p style="color: var(--muted); max-width: 500px; margin: 16px auto 0;">
+                Une approche simple et efficace pour garantir la réussite de votre projet.
+            </p>
+        </div>
+
+        <div class="process-steps">
+            <div class="step reveal delay-1">
+                <div class="step-num">01</div>
+                <h4>Analyse & Brief</h4>
+                <p>Compréhension approfondie de vos besoins et objectifs.</p>
+            </div>
+            <div class="step reveal delay-2">
+                <div class="step-num">02</div>
+                <h4>Proposition & Plan</h4>
+                <p>Élaboration d'une solution sur mesure avec planning détaillé.</p>
+            </div>
+            <div class="step reveal delay-3">
+                <div class="step-num">03</div>
+                <h4>Réalisation</h4>
+                <p>Développement itératif avec points de contrôle réguliers.</p>
+            </div>
+            <div class="step reveal delay-4">
+                <div class="step-num">04</div>
+                <h4>Livraison & Support</h4>
+                <p>Déploiement, documentation et accompagnement post-projet.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technologies & Tools -->
+    <div class="services-cta reveal">
+        <i class="fas fa-microchip" style="font-size: 2.5rem; color: var(--cyan); margin-bottom: 20px; display: inline-block;"></i>
+        <h3 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 16px;">Technologies maîtrisées</h3>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px;">
+            <span class="skill-badge"><i class="fab fa-python"></i> Python</span>
+            <span class="skill-badge">Django</span>
+            <span class="skill-badge"><i class="fab fa-js"></i> JavaScript</span>
+            <span class="skill-badge">PostgreSQL</span>
+            <span class="skill-badge">Linux</span>
+            <span class="skill-badge">Docker</span>
+            <span class="skill-badge">CCNA</span>
+            <span class="skill-badge">Git/GitHub</span>
+            <span class="skill-badge">Bootstrap 5</span>
+            <span class="skill-badge">REST API</span>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+        <div class="text-center reveal">
+            <div class="section-label" style="justify-content: center;">FAQ</div>
+            <h2 class="section-heading">
+                Questions <span class="hi">fréquentes</span>
+            </h2>
+        </div>
+
+        <div class="faq-grid">
+            <div class="faq-item reveal delay-1">
+                <div class="faq-question">
+                    <span>Quels types de projets acceptez-vous ?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Je prends en charge les projets de développement web (Django/Python), l'infrastructure réseau (cablage, configuration routeurs/switchs, VLAN, sécurité réseau), ainsi que le conseil technique et la formation. Les projets peuvent être des missions freelance, des collaborations ou des CDD/CDI.
+                </div>
+            </div>
+            <div class="faq-item reveal delay-2">
+                <div class="faq-question">
+                    <span>Quels sont vos délais de livraison ?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Les délais varient selon la complexité du projet. Pour un site vitrine simple : 2-3 semaines. Une application web complète : 4-8 semaines. Pour les projets réseau, tout dépend de l'étendue de l'infrastructure. Un planning détaillé est fourni après analyse de vos besoins.
+                </div>
+            </div>
+            <div class="faq-item reveal delay-3">
+                <div class="faq-question">
+                    <span>Travaillez-vous à distance ?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Oui, je travaille efficacement à distance pour les développements web et le support technique. Pour les missions réseau nécessitant une présence sur site, je peux me déplacer selon la localisation (principalement Bukavu et environs, avec possibilité de voyages pour des projets d'envergure).
+                </div>
+            </div>
+            <div class="faq-item reveal delay-4">
+                <div class="faq-question">
+                    <span>Proposez-vous des garanties ?</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Absolument ! Tous mes travaux incluent une période de garantie de 3 mois pour les corrections de bugs. Je fournis également une documentation complète et un support technique après livraison. La satisfaction client est ma priorité.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final CTA -->
+    <div class="services-cta reveal" style="background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.12));">
+        <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 16px;">Prêt à concrétiser votre projet ?</h3>
+        <p style="color: var(--muted); max-width: 480px; margin: 0 auto 28px;">
+            Discutons de vos idées et trouvons ensemble la meilleure solution.
+        </p>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a href="{% url 'contact' %}" class="btn-neon primary">
+                <i class="fas fa-calendar-alt"></i> Prendre rendez-vous
+            </a>
+            <a href="{% url 'project_list' %}" class="btn-neon ghost">
+                <i class="fas fa-folder-open"></i> Voir mes réalisations
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// FAQ Accordion
+document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+        const item = question.parentElement;
+        const isOpen = item.classList.contains('open');
+        
+        // Close all others (optional - comment out for independent toggles)
+        document.querySelectorAll('.faq-item').forEach(faq => {
+            if (faq !== item) faq.classList.remove('open');
+        });
+        
+        item.classList.toggle('open');
+    });
+});
+</script>
+{% endblock %}

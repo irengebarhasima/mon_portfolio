@@ -5,247 +5,920 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Daniel Irenge - Ingénieur Réseaux & Télécoms{% endblock %}</title>
-    
-    <!-- Bootstrap 5 CSS -->
+
+    <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <!-- Font Awesome (pour les étoiles) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500&display=swap" rel="stylesheet">
+
     <style>
-        /* ==================================================
-           STYLES PERSONNALISÉS
-           ================================================== */
-        
-        /* Corps de la page */
+        /* ============================================================
+           DESIGN SYSTEM
+        ============================================================ */
+        :root {
+            --bg:        #04050f;
+            --bg2:       #080a1a;
+            --bg3:       #0d1030;
+            --cyan:      #00d4ff;
+            --cyan-dim:  rgba(0,212,255,0.12);
+            --purple:    #7c3aed;
+            --purple-dim:rgba(124,58,237,0.15);
+            --gold:      #f59e0b;
+            --pink:      #ec4899;
+            --text:      #e2e8f0;
+            --muted:     #64748b;
+            --border:    rgba(255,255,255,0.06);
+            --glass:     rgba(255,255,255,0.03);
+            --glow-cyan: 0 0 30px rgba(0,212,255,0.35);
+            --glow-purple:0 0 30px rgba(124,58,237,0.35);
+            --radius-lg: 20px;
+            --radius-xl: 28px;
+            --nav-h:     70px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            overflow-x: hidden;
         }
-        
-        /* Contenu principal (pousse le footer vers le bas) */
-        main {
-            flex: 1;
+
+        main { flex: 1; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--cyan), var(--purple));
+            border-radius: 2px;
         }
-        
-        /* Hero section (bandeau d'accueil) */
-        .hero-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 40px;
-            border-radius: 0 0 20px 20px;
+
+        /* ============================================================
+           CANVAS BACKGROUND (Three.js target)
+        ============================================================ */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
         }
-        
-        /* Cartes de projet */
-        .project-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: none;
-            border-radius: 15px;
+
+        /* ============================================================
+           NAVBAR
+        ============================================================ */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            height: var(--nav-h);
+            background: rgba(4, 5, 15, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+            transition: background 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(4, 5, 15, 0.92);
+            box-shadow: 0 4px 40px rgba(0,0,0,0.6);
+        }
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+
+        /* Brand */
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: -0.3px;
+            color: var(--text) !important;
+        }
+
+        .brand-cube {
+            width: 36px; height: 36px;
+            position: relative;
+            perspective: 500px;
+        }
+
+        .brand-cube-inner {
+            width: 100%; height: 100%;
+            transform-style: preserve-3d;
+            animation: rotateCube 8s linear infinite;
+            position: relative;
+        }
+
+        .cube-face {
+            position: absolute;
+            width: 36px; height: 36px;
+            border: 1.5px solid var(--cyan);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: var(--cyan);
+            background: rgba(0,212,255,0.05);
+        }
+
+        .cube-face.front  { transform: translateZ(18px); }
+        .cube-face.back   { transform: rotateY(180deg) translateZ(18px); }
+        .cube-face.right  { transform: rotateY(90deg) translateZ(18px); }
+        .cube-face.left   { transform: rotateY(-90deg) translateZ(18px); }
+        .cube-face.top    { transform: rotateX(90deg) translateZ(18px); }
+        .cube-face.bottom { transform: rotateX(-90deg) translateZ(18px); }
+
+        @keyframes rotateCube {
+            0%   { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        .brand-name span { color: var(--cyan); }
+
+        /* Nav links */
+        .navbar-nav { gap: 4px; }
+
+        .nav-link {
+            position: relative;
+            color: var(--muted) !important;
+            font-weight: 500;
+            font-size: 0.88rem;
+            padding: 8px 14px !important;
+            border-radius: 10px;
+            transition: color 0.25s ease, background 0.25s ease;
+            letter-spacing: 0.2px;
             overflow: hidden;
         }
-        
-        .project-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--cyan-dim), var(--purple-dim));
+            opacity: 0;
+            border-radius: 10px;
+            transition: opacity 0.25s ease;
         }
-        
-        .project-card img {
-            height: 200px;
-            object-fit: cover;
+
+        .nav-link:hover::before, .nav-link.active::before { opacity: 1; }
+        .nav-link:hover, .nav-link.active { color: var(--text) !important; }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 4px; left: 50%; right: 50%;
+            height: 2px;
+            background: var(--cyan);
+            border-radius: 1px;
+            transition: left 0.3s ease, right 0.3s ease;
         }
-        
-        /* Étoiles de notation */
-        .stars {
-            color: #ffc107;
-            font-size: 1.2rem;
-            letter-spacing: 2px;
+
+        .nav-link:hover::after, .nav-link.active::after { left: 14px; right: 14px; }
+
+        .navbar-toggler {
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 10px;
+            color: var(--text);
         }
-        
-        /* Bouton like */
-        .like-btn {
-            transition: all 0.3s ease;
+
+        .navbar-toggler:focus { box-shadow: none; }
+
+        /* ============================================================
+           UTILITY — REVEAL ON SCROLL
+        ============================================================ */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1),
+                        transform 0.7s cubic-bezier(0.16,1,0.3,1);
         }
-        
-        .like-btn:hover {
-            transform: scale(1.05);
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-        
-        /* Footer */
-        .footer {
-            background-color: #2d3748;
-            color: #cbd5e0;
-            padding: 40px 0 20px;
-            margin-top: 60px;
+
+        .reveal-left  { transform: translateX(-40px); }
+        .reveal-right { transform: translateX(40px); }
+        .reveal-left.visible, .reveal-right.visible { transform: translateX(0); }
+
+        .delay-1 { transition-delay: 0.1s !important; }
+        .delay-2 { transition-delay: 0.2s !important; }
+        .delay-3 { transition-delay: 0.3s !important; }
+        .delay-4 { transition-delay: 0.4s !important; }
+
+        /* ============================================================
+           SHARED COMPONENTS
+        ============================================================ */
+
+        /* Section label */
+        .section-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--cyan);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 14px;
         }
-        
-        .footer a {
-            color: #cbd5e0;
-            text-decoration: none;
-            transition: color 0.3s ease;
+
+        .section-label::before, .section-label::after {
+            content: '';
+            width: 28px; height: 1px;
+            background: var(--cyan);
+            opacity: 0.6;
         }
-        
-        .footer a:hover {
-            color: white;
+
+        /* Section heading */
+        .section-heading {
+            font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+            color: var(--text);
         }
-        
-        /* Animation pour les notifications */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .section-heading .hi {
+            background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 60%, var(--pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        
-        .alert-notification {
-            animation: fadeIn 0.5s ease;
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            min-width: 300px;
+
+        /* Glass card */
+        .glass-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
         }
-        
-        /* Section compétences */
-        .skill-badge {
-            background-color: #e9ecef;
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin: 5px;
-            display: inline-block;
+
+        .glass-card:hover {
+            border-color: rgba(0,212,255,0.2);
+            box-shadow: var(--glow-cyan);
+        }
+
+        /* Neon button */
+        .btn-neon {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 600;
             font-size: 0.9rem;
+            overflow: hidden;
+            letter-spacing: 0.2px;
             transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
         }
-        
+
+        .btn-neon.primary {
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            color: #fff;
+            box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+        }
+
+        .btn-neon.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,212,255,0.5);
+            color: #fff;
+        }
+
+        .btn-neon.ghost {
+            background: transparent;
+            color: var(--text);
+            border: 1.5px solid rgba(255,255,255,0.12);
+        }
+
+        .btn-neon.ghost:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: var(--glow-cyan);
+            transform: translateY(-3px);
+        }
+
+        .btn-neon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .btn-neon:hover::after { opacity: 1; }
+
+        /* Badge hero */
+        .neon-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(0,212,255,0.3);
+            background: rgba(0,212,255,0.08);
+            color: var(--cyan);
+            padding: 6px 18px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .neon-badge .dot {
+            width: 7px; height: 7px;
+            background: var(--cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--cyan);
+            animation: blinkDot 2s infinite;
+        }
+
+        @keyframes blinkDot {
+            0%, 100% { opacity: 1; }
+            50%       { opacity: 0.2; }
+        }
+
+        /* Stars */
+        .stars { color: var(--gold); font-size: 0.9rem; letter-spacing: 1px; }
+
+        /* Like btn */
+        .like-btn { transition: transform 0.3s ease; }
+        .like-btn:hover { transform: scale(1.08); }
+
+        /* Skill badge */
+        .skill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,212,255,0.07);
+            border: 1px solid rgba(0,212,255,0.18);
+            color: rgba(0,212,255,0.9);
+            padding: 5px 14px;
+            border-radius: 50px;
+            margin: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: default;
+            transition: all 0.25s ease;
+        }
+
         .skill-badge:hover {
-            background-color: #667eea;
-            color: white;
-            transform: scale(1.05);
+            background: rgba(0,212,255,0.18);
+            border-color: var(--cyan);
+            box-shadow: 0 0 12px rgba(0,212,255,0.3);
+            transform: translateY(-2px);
         }
-        
-        /* Responsive */
+
+        /* Alert */
+        @keyframes slideAlertIn {
+            from { opacity:0; transform: translateX(60px); }
+            to   { opacity:1; transform: translateX(0); }
+        }
+
+        .alert-notification {
+            animation: slideAlertIn 0.4s cubic-bezier(0.16,1,0.3,1);
+            position: fixed;
+            top: 90px; right: 20px;
+            z-index: 9999;
+            min-width: 320px;
+            background: var(--bg2);
+            border: 1px solid rgba(0,212,255,0.25);
+            border-radius: var(--radius-lg);
+            color: var(--text);
+            box-shadow: var(--glow-cyan), 0 16px 48px rgba(0,0,0,0.6);
+            padding: 14px 18px;
+        }
+
+        .alert-notification .btn-close { filter: invert(1); }
+
+        /* Project card */
+        .project-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transform-style: preserve-3d;
+        }
+
+        .project-card:hover {
+            border-color: rgba(0,212,255,0.3);
+            box-shadow: var(--glow-cyan), 0 24px 60px rgba(0,0,0,0.5);
+        }
+
+        .project-card img { height: 200px; object-fit: cover; }
+
+        .project-card .card-body {
+            background: transparent;
+            padding: 1.4rem;
+        }
+
+        .project-card .card-title { color: var(--text); font-weight: 700; }
+        .project-card .card-text  { color: var(--muted); font-size: 0.875rem; }
+
+        /* ============================================================
+           FOOTER
+        ============================================================ */
+        .footer {
+            position: relative;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            padding: 72px 0 32px;
+            margin-top: 80px;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 50%; transform: translateX(-50%);
+            width: 60%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+        }
+
+        .footer-glow {
+            position: absolute;
+            bottom: -120px; left: 50%;
+            transform: translateX(-50%);
+            width: 600px; height: 300px;
+            background: radial-gradient(ellipse, rgba(0,212,255,0.07) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .footer-logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .footer-logo span { color: var(--cyan); }
+
+        .footer h6 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .footer ul { list-style: none; padding: 0; }
+
+        .footer ul li a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            transition: color 0.2s ease, gap 0.2s ease;
+        }
+
+        .footer ul li a:hover { color: var(--cyan); gap: 12px; }
+        .footer ul li a i { font-size: 0.7rem; color: var(--cyan); opacity: 0.5; }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .footer-contact-item i {
+            color: var(--cyan);
+            margin-top: 2px;
+            font-size: 0.85rem;
+            min-width: 16px;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px; height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.25s ease;
+            margin: 0 4px;
+        }
+
+        .social-btn:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+            box-shadow: 0 0 14px rgba(0,212,255,0.35);
+            transform: translateY(-4px);
+        }
+
+        .footer-divider { border-color: var(--border); margin: 32px 0 20px; }
+
+        .footer-bottom {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        /* Available card in footer */
+        .avail-card {
+            background: rgba(0,212,255,0.06);
+            border: 1px solid rgba(0,212,255,0.15);
+            border-radius: 16px;
+            padding: 18px 20px;
+        }
+
+        .avail-dot {
+            width: 8px; height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22c55e;
+            animation: blinkDot 2.5s infinite;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
         @media (max-width: 768px) {
-            .hero-section {
-                padding: 50px 0;
-            }
-            .hero-section h1 {
-                font-size: 1.8rem;
-            }
+            :root { --nav-h: 60px; }
         }
     </style>
-    
+
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    
-    <!-- ==================================================
-         BARRE DE NAVIGATION (NAVBAR)
-         ================================================== -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
-                <i class="fas fa-code me-2"></i>Daniel Irenge
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">
-                            <i class="fas fa-home me-1"></i>Accueil
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'project_list' %}">
-                            <i class="fas fa-folder-open me-1"></i>Projets
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'service_list' %}">
-                            <i class="fas fa-cogs me-1"></i>Services
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'contact' %}">
-                            <i class="fas fa-envelope me-1"></i>Contact
-                        </a>
-                    </li>
+
+<!-- THREE.JS PARTICLE BACKGROUND -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ================================================================
+     NAVBAR
+================================================================ -->
+<nav class="navbar navbar-expand-lg" id="mainNav">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">
+            <div class="brand-cube">
+                <div class="brand-cube-inner">
+                    <div class="cube-face front"><i class="fas fa-code"></i></div>
+                    <div class="cube-face back"><i class="fas fa-code"></i></div>
+                    <div class="cube-face right"></div>
+                    <div class="cube-face left"></div>
+                    <div class="cube-face top"></div>
+                    <div class="cube-face bottom"></div>
+                </div>
+            </div>
+            Daniel<span class="brand-name"><span>.</span>dev</span>
+        </a>
+
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navLinks">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navLinks">
+            <ul class="navbar-nav ms-auto align-items-lg-center py-3 py-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">
+                        <i class="fas fa-home me-1"></i>Accueil
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'about' %}">
+                        <i class="fas fa-user me-1"></i>À propos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'project_list' %}">
+                        <i class="fas fa-folder-open me-1"></i>Projets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'service_list' %}">
+                        <i class="fas fa-cogs me-1"></i>Services
+                    </a>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <a class="btn-neon primary" href="{% url 'contact' %}" style="padding:9px 20px;font-size:0.85rem;">
+                        <i class="fas fa-paper-plane"></i>Contact
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ================================================================
+     MAIN CONTENT
+================================================================ -->
+<main style="padding-top: var(--nav-h); position: relative; z-index: 1;">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-notification" role="alert">
+                <i class="fas fa-check-circle me-2" style="color:#22c55e;"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ================================================================
+     FOOTER
+================================================================ -->
+<footer class="footer" style="position:relative;z-index:1;">
+    <div class="footer-glow"></div>
+    <div class="container position-relative">
+        <div class="row g-5">
+
+            <!-- Brand -->
+            <div class="col-lg-4 col-md-6">
+                <div class="footer-logo">
+                    <div class="brand-cube" style="width:28px;height:28px;">
+                        <div class="brand-cube-inner">
+                            <div class="cube-face front" style="width:28px;height:28px;font-size:0.6rem;"></div>
+                            <div class="cube-face back"  style="width:28px;height:28px;"></div>
+                            <div class="cube-face right" style="width:28px;height:28px;"></div>
+                            <div class="cube-face left"  style="width:28px;height:28px;"></div>
+                            <div class="cube-face top"   style="width:28px;height:28px;"></div>
+                            <div class="cube-face bottom"style="width:28px;height:28px;"></div>
+                        </div>
+                    </div>
+                    Daniel Irenge<span>.</span>
+                </div>
+                <p style="color:var(--muted);font-size:0.875rem;line-height:1.75;margin-bottom:20px;">
+                    Ingénieur en Réseaux &amp; Télécommunications, passionné par les solutions
+                    numériques et l'innovation technologique en Afrique.
+                </p>
+                <div>
+                    <a class="social-btn" href="https://linkedin.com/in/daniel-irenge-barhasima" target="_blank">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a class="social-btn" href="https://wa.me/243898145014" target="_blank">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a class="social-btn" href="mailto:irenge.barhasima@ucbukavu.ac.cd">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                    <a class="social-btn" href="{% url 'project_list' %}">
+                        <i class="fas fa-code-branch"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="col-lg-2 col-md-6">
+                <h6>Navigation</h6>
+                <ul>
+                    <li><a href="{% url 'home' %}"><i class="fas fa-chevron-right"></i>Accueil</a></li>
+                    <li><a href="{% url 'about' %}"><i class="fas fa-chevron-right"></i>À propos</a></li>
+                    <li><a href="{% url 'project_list' %}"><i class="fas fa-chevron-right"></i>Projets</a></li>
+                    <li><a href="{% url 'service_list' %}"><i class="fas fa-chevron-right"></i>Services</a></li>
+                    <li><a href="{% url 'contact' %}"><i class="fas fa-chevron-right"></i>Contact</a></li>
                 </ul>
             </div>
-        </div>
-    </nav>
-    
-    <!-- ==================================================
-         CONTENU PRINCIPAL
-         ================================================== -->
-    <main>
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-notification" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>{{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+            <!-- Contact -->
+            <div class="col-lg-3 col-md-6">
+                <h6>Contact Direct</h6>
+                <div class="footer-contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>irenge.barhasima@ucbukavu.ac.cd</span>
                 </div>
-            {% endfor %}
-        {% endif %}
-        
-        {% block content %}
-        {% endblock %}
-    </main>
-    
-    <!-- ==================================================
-         FOOTER (PIED DE PAGE)
-         ================================================== -->
-    <footer class="footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-user-circle me-2"></i>Daniel Irenge Barhasima</h5>
-                    <p>Ingénieur en Réseaux & Télécommunications<br>
-                    Passionné par les solutions numériques et l'innovation.</p>
+                <div class="footer-contact-item">
+                    <i class="fab fa-whatsapp"></i>
+                    <span>+243 898 145 014</span>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-link me-2"></i>Liens rapides</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'home' %}"><i class="fas fa-chevron-right me-1"></i>Accueil</a></li>
-                        <li><a href="{% url 'project_list' %}"><i class="fas fa-chevron-right me-1"></i>Projets</a></li>
-                        <li><a href="{% url 'service_list' %}"><i class="fas fa-chevron-right me-1"></i>Services</a></li>
-                        <li><a href="{% url 'contact' %}"><i class="fas fa-chevron-right me-1"></i>Contact</a></li>
-                    </ul>
+                <div class="footer-contact-item">
+                    <i class="fab fa-linkedin"></i>
+                    <span>Daniel Irenge Barhasima</span>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h5><i class="fas fa-phone-alt me-2"></i>Contact</h5>
-                    <ul class="list-unstyled">
-                        <li><i class="fas fa-envelope me-2"></i>irenge.barhasima@ucbukavu.ac.cd</li>
-                        <li><i class="fab fa-whatsapp me-2"></i>+243 898 145 014</li>
-                        <li><i class="fab fa-linkedin me-2"></i>Daniel Irenge Barhasima</li>
-                    </ul>
+                <div class="footer-contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Bukavu, République Démocratique du Congo</span>
                 </div>
             </div>
-            <hr class="bg-secondary">
-            <div class="text-center">
-                <p class="mb-0">&copy; {% now "Y" %} Daniel Irenge Barhasima - Tous droits réservés</p>
+
+            <!-- Status -->
+            <div class="col-lg-3 col-md-6">
+                <h6>Statut</h6>
+                <div class="avail-card mb-3">
+                    <p style="font-size:0.83rem;color:var(--text);font-weight:600;margin-bottom:6px;">
+                        <span class="avail-dot"></span>Disponible pour missions
+                    </p>
+                    <p style="font-size:0.78rem;color:var(--muted);margin:0;">
+                        Freelance · Stages · Emploi<br>
+                        Réponse sous 24h.
+                    </p>
+                </div>
+                <a href="{% url 'contact' %}" class="btn-neon primary w-100" style="justify-content:center;">
+                    <i class="fas fa-rocket"></i>Démarrer un projet
+                </a>
             </div>
+
         </div>
-    </footer>
-    
-    <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery (pour AJAX) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <script>
-        // Auto-fermeture des alertes après 5 secondes
-        setTimeout(function() {
-            document.querySelectorAll('.alert').forEach(function(alert) {
-                var bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            });
-        }, 5000);
-    </script>
-    
-    {% block extra_js %}{% endblock %}
+
+        <hr class="footer-divider">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center footer-bottom gap-2">
+            <p class="mb-0">&copy; {% now "Y" %} Daniel Irenge Barhasima — Tous droits réservés</p>
+            <p class="mb-0" style="font-family:'Fira Code',monospace;font-size:0.75rem;color:rgba(0,212,255,0.5);">
+                &lt;/&gt; Built with Django &amp; 💙
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<!-- VanillaTilt -->
+<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
+<!-- Typed.js -->
+<script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.16/dist/typed.umd.js"></script>
+
+<script>
+/* ================================================================
+   THREE.JS — PARTICLE NETWORK BACKGROUND
+================================================================ */
+(function() {
+    const canvas  = document.getElementById('bg-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 60;
+
+    /* Particle geometry */
+    const count  = 1800;
+    const geo    = new THREE.BufferGeometry();
+    const pos    = new Float32Array(count * 3);
+    const colors = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+        pos[i * 3]     = (Math.random() - 0.5) * 200;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * 200;
+        pos[i * 3 + 2] = (Math.random() - 0.5) * 200;
+
+        /* Randomly cyan or purple tinted */
+        const t = Math.random();
+        if (t < 0.5) {
+            colors[i*3]=0; colors[i*3+1]=0.7+Math.random()*0.3; colors[i*3+2]=1;
+        } else {
+            colors[i*3]=0.4+Math.random()*0.2; colors[i*3+1]=0.1; colors[i*3+2]=0.8+Math.random()*0.2;
+        }
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+
+    const mat = new THREE.PointsMaterial({
+        size: 0.4,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.7,
+        sizeAttenuation: true
+    });
+
+    const particles = new THREE.Points(geo, mat);
+    scene.add(particles);
+
+    /* Mouse parallax */
+    let mx = 0, my = 0;
+    window.addEventListener('mousemove', e => {
+        mx = (e.clientX / window.innerWidth  - 0.5) * 0.3;
+        my = (e.clientY / window.innerHeight - 0.5) * 0.3;
+    });
+
+    /* Resize */
+    window.addEventListener('resize', () => {
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+    });
+
+    /* Animate */
+    let frame = 0;
+    function animate() {
+        requestAnimationFrame(animate);
+        frame += 0.002;
+        particles.rotation.y = frame + mx;
+        particles.rotation.x = frame * 0.4 + my;
+        renderer.render(scene, camera);
+    }
+    animate();
+})();
+
+/* ================================================================
+   NAVBAR — SCROLL EFFECT
+================================================================ */
+window.addEventListener('scroll', function() {
+    document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 30);
+});
+
+/* ================================================================
+   ACTIVE NAV LINK
+================================================================ */
+(function() {
+    const path = window.location.pathname;
+    document.querySelectorAll('.nav-link').forEach(a => {
+        if (a.getAttribute('href') === path) a.classList.add('active');
+    });
+})();
+
+/* ================================================================
+   SCROLL REVEAL — IntersectionObserver
+================================================================ */
+(function() {
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('visible'); }
+        });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+})();
+
+/* ================================================================
+   AUTO-CLOSE ALERTS
+================================================================ */
+setTimeout(() => {
+    document.querySelectorAll('.alert').forEach(a => {
+        bootstrap.Alert.getOrCreateInstance(a).close();
+    });
+}, 5000);
+
+/* ================================================================
+   VANILLA TILT — Project Cards
+================================================================ */
+VanillaTilt.init(document.querySelectorAll('.project-card'), {
+    max: 8, speed: 400, glare: true, 'max-glare': 0.12, scale: 1.03
+});
+
+/* ================================================================
+   COUNTER ANIMATION
+================================================================ */
+function animateCounter(el) {
+    const target = parseFloat(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const dur    = 1600;
+    const step   = 16;
+    const inc    = target / (dur / step);
+    let cur      = 0;
+    const timer  = setInterval(() => {
+        cur += inc;
+        if (cur >= target) { cur = target; clearInterval(timer); }
+        el.textContent = (Number.isInteger(target) ? Math.floor(cur) : cur.toFixed(1)) + suffix;
+    }, step);
+}
+
+const counterIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting && !e.target.dataset.counted) {
+            e.target.dataset.counted = 1;
+            animateCounter(e.target);
+        }
+    });
+}, { threshold: 0.5 });
+document.querySelectorAll('[data-count]').forEach(el => counterIO.observe(el));
+</script>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>

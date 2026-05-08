@@ -26,5 +26,5 @@ urlpatterns = [
     path('projects/', include('projects.urls')),
     path('services/', include('services.urls')),
     path('contact/', include('contact.urls')),
-    path('api/', include('core.urls')),  # ← AJOUTER CETTE LIGNE (important)
+    path('', include('core.urls')),  # ← AJOUTER CETTE LIGNE (important)
 ]

@@ -1,76 +1,960 @@
 {% extends "core/base.html" %}
 
-{% block title %}Accueil - Daniel Irenge{% endblock %}
+{% block title %}Accueil - Daniel Irenge | Ingénieur Réseaux & Télécoms{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   HOME — HERO SECTION
+================================================================ */
+.hero {
+    min-height: calc(100vh - var(--nav-h));
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 60px;
+    padding: 80px 0;
+    position: relative;
+}
+
+@media (max-width: 991px) {
+    .hero { 
+        grid-template-columns: 1fr; 
+        padding: 60px 0 40px; 
+        text-align: center; 
+    }
+    .hero-visual { display: none; }
+}
+
+/* Animated background orbs */
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.orb-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0,212,255,0.12), transparent 70%);
+    top: -10%;
+    left: -15%;
+    animation: orbFloat1 12s ease-in-out infinite;
+}
+
+.orb-2 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(124,58,237,0.12), transparent 70%);
+    bottom: -15%;
+    right: -10%;
+    animation: orbFloat2 14s ease-in-out infinite;
+}
+
+.orb-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(236,72,153,0.08), transparent 70%);
+    top: 40%;
+    right: 20%;
+    animation: orbFloat3 10s ease-in-out infinite;
+}
+
+@keyframes orbFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -30px) scale(1.08); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+@keyframes orbFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-25px, 25px) scale(1.05); }
+    66% { transform: translate(20px, -15px) scale(0.97); }
+}
+
+@keyframes orbFloat3 {
+    0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+    50% { transform: translate(15px, -20px); opacity: 1; }
+}
+
+/* Hero left content */
+.hero-left {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-greeting {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 60px;
+    padding: 6px 18px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--cyan);
+    margin-bottom: 24px;
+}
+
+.hero-greeting .wave {
+    font-size: 1.1rem;
+    animation: wave 2s infinite;
+    transform-origin: 70% 70%;
+    display: inline-block;
+}
+
+@keyframes wave {
+    0% { transform: rotate(0deg); }
+    10% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    30% { transform: rotate(14deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+    60% { transform: rotate(0deg); }
+    100% { transform: rotate(0deg); }
+}
+
+.hero-title {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -2px;
+    color: var(--text);
+    margin-bottom: 20px;
+}
+
+.hero-title .gradient-text {
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: block;
+}
+
+.typed-wrapper {
+    display: block;
+    margin-top: 8px;
+}
+
+#typed-target {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-description {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 500px;
+    line-height: 1.8;
+    margin-bottom: 36px;
+}
+
+@media (max-width: 991px) {
+    .hero-description { margin-left: auto; margin-right: auto; }
+}
+
+/* Button group */
+.btn-group-custom {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 48px;
+}
+
+/* Stats section */
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    background: rgba(255,255,255,0.02);
+    backdrop-filter: blur(10px);
+    width: fit-content;
+}
+
+@media (max-width: 991px) {
+    .stats-container { margin: 0 auto; }
+}
+
+.stat-block {
+    padding: 20px 32px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.stat-block:last-child { border-right: none; }
+
+.stat-block:hover {
+    background: rgba(0,212,255,0.03);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-number .plus {
+    color: var(--cyan);
+    font-size: 1.2rem;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 6px;
+    display: block;
+    text-transform: uppercase;
+}
+
+/* Hero Visual - 3D Code Card */
+.hero-visual {
+    position: relative;
+    z-index: 2;
+    perspective: 1200px;
+}
+
+.code-card-3d {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin-left: auto;
+    transform-style: preserve-3d;
+}
+
+.code-card {
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08));
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 28px;
+    padding: 28px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+    animation: cardFloat 6s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.code-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0,212,255,0.06), transparent 70%);
+    pointer-events: none;
+}
+
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0) rotateX(2deg) rotateY(-3deg); }
+    50% { transform: translateY(-15px) rotateX(-1deg) rotateY(2deg); }
+}
+
+/* Code header */
+.code-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.window-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.window-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.window-dot.red { background: #ff5f56; }
+.window-dot.yellow { background: #ffbd2e; }
+.window-dot.green { background: #27c93f; }
+
+.code-title {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-left: auto;
+}
+
+/* Code body */
+.code-body {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 2;
+}
+
+.code-keyword { color: #c792ea; }
+.code-function { color: #82aaff; }
+.code-string { color: #c3e88d; }
+.code-operator { color: #89ddff; }
+.code-comment { color: #546e7a; font-style: italic; }
+.code-constant { color: var(--cyan); }
+.code-class { color: #ffcb6b; }
+
+/* Floating badges */
+.floating-badge {
+    position: absolute;
+    background: rgba(13, 16, 48, 0.95);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 16px;
+    padding: 10px 16px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.badge-1 {
+    top: -20px;
+    right: -20px;
+    animation: floatBadge1 4s ease-in-out infinite;
+}
+
+.badge-2 {
+    bottom: -15px;
+    left: -25px;
+    animation: floatBadge2 5s ease-in-out infinite;
+}
+
+.badge-3 {
+    top: 30%;
+    right: -30px;
+    animation: floatBadge3 3.5s ease-in-out infinite;
+}
+
+@keyframes floatBadge1 {
+    0%, 100% { transform: translateY(0) rotate(3deg); }
+    50% { transform: translateY(-10px) rotate(-2deg); }
+}
+
+@keyframes floatBadge2 {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(10px) rotate(2deg); }
+}
+
+@keyframes floatBadge3 {
+    0%, 100% { transform: translateX(0) translateY(0); }
+    50% { transform: translateX(8px) translateY(-8px); }
+}
+
+/* ================================================================
+   FEATURED PROJECTS SECTION
+================================================================ */
+.featured-section {
+    padding: 80px 0;
+    position: relative;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-subtitle {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--cyan);
+    margin-bottom: 12px;
+}
+
+.section-title {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 700;
+    color: var(--text);
+}
+
+.section-title .highlight {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Projects grid */
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+@media (max-width: 768px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Project card */
+.project-card-home {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-card-home:hover {
+    border-color: rgba(0,212,255,0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.project-image {
+    height: 220px;
+    overflow: hidden;
+    position: relative;
+}
+
+.project-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.project-card-home:hover .project-image img {
+    transform: scale(1.05);
+}
+
+.project-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 20px;
+}
+
+.project-card-home:hover .project-overlay {
+    opacity: 1;
+}
+
+.project-content {
+    padding: 24px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.project-category {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    margin-bottom: 12px;
+}
+
+.project-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.4;
+}
+
+.project-description {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    flex: 1;
+}
+
+.project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.tech-pill {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 30px;
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    color: var(--cyan);
+}
+
+.project-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.project-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.stat i.fa-heart { color: #ec4899; }
+.stat i.fa-comment { color: var(--cyan); }
+
+/* View all button */
+.view-all-wrapper {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* ================================================================
+   SERVICES PREVIEW
+================================================================ */
+.services-preview {
+    padding: 60px 0;
+    background: linear-gradient(135deg, rgba(0,212,255,0.02), rgba(124,58,237,0.02));
+    border-radius: 48px;
+    margin: 40px 0;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+}
+
+@media (max-width: 992px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.service-item {
+    text-align: center;
+    padding: 32px 24px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    transition: all 0.3s ease;
+}
+
+.service-item:hover {
+    border-color: var(--cyan);
+    transform: translateY(-5px);
+}
+
+.service-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.service-icon i {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.service-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.service-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+/* ================================================================
+   CTA BANNER
+================================================================ */
+.cta-banner {
+    margin: 80px 0;
+    padding: 70px 50px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.12));
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+}
+
+.cta-title {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.cta-text {
+    color: var(--muted);
+    max-width: 500px;
+    margin: 0 auto 30px;
+    line-height: 1.7;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-section">
-    <div class="container text-center">
-        <h1 class="display-4 fw-bold mb-3">{{ home_title }}</h1>
-        <p class="lead mb-4">{{ home_slogan }}</p>
-        <a href="{% url 'project_list' %}" class="btn btn-light btn-lg me-2">
-            <i class="fas fa-folder-open me-2"></i>Voir mes projets
-        </a>
-        <a href="{% url 'contact' %}" class="btn btn-outline-light btn-lg">
-            <i class="fas fa-envelope me-2"></i>Me contacter
-        </a>
-    </div>
-</div>
 
+<!-- HERO SECTION -->
 <div class="container">
-    <!-- Derniers projets -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="text-center mb-4">
-                <i class="fas fa-star-of-life me-2 text-primary"></i>
-                Derniers projets
-                <i class="fas fa-star-of-life ms-2 text-primary"></i>
-            </h2>
+    <section class="hero">
+        <!-- Animated Orbs -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+
+        <!-- Left Content -->
+        <div class="hero-left">
+            <div class="hero-greeting reveal">
+                <span class="wave"></span>
+                <span>Bonjour, je suis</span>
+            </div>
+
+            <h1 class="hero-title reveal delay-1">
+                Daniel Irenge
+                <span class="typed-wrapper">
+                    <span id="typed-target"></span>
+                </span>
+            </h1>
+
+            <p class="hero-description reveal delay-2">
+                Ingénieur en Réseaux &amp; Télécommunications passionné par la création de solutions 
+                numériques innovantes. Je transforme les idées en réalité digitale.
+            </p>
+
+            <div class="btn-group-custom reveal delay-3">
+                <a href="{% url 'project_list' %}" class="btn-neon primary">
+                    <i class="fas fa-folder-open"></i> Voir mes projets
+                </a>
+                <a href="{% url 'contact' %}" class="btn-neon ghost">
+                    <i class="fas fa-paper-plane"></i> Me contacter
+                </a>
+                <a href="{% url 'service_list' %}" class="btn-neon ghost">
+                    <i class="fas fa-cogs"></i> Mes services
+                </a>
+            </div>
+
+            <div class="stats-container reveal delay-4">
+                <div class="stat-block">
+                    <span class="stat-number"><span data-count="3" data-suffix="">3</span><span class="plus">+</span></span>
+                    <span class="stat-label">Années d'expérience</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-number"><span data-count="15" data-suffix="">15</span><span class="plus">+</span></span>
+                    <span class="stat-label">Projets réalisés</span>
+                </div>
+                <div class="stat-block">
+                    <span class="stat-number"><span data-count="10" data-suffix="">10</span><span class="plus">+</span></span>
+                    <span class="stat-label">Clients satisfaits</span>
+                </div>
+            </div>
         </div>
-        {% for project in projects %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card project-card h-100">
-                {% if project.image_url %}
-                    <img src="{{ project.image_url }}" class="card-img-top" alt="{{ project.title }}">
-                {% else %}
-                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 200px;">
-                        <i class="fas fa-image fa-3x"></i>
+
+        <!-- Right Visual -->
+        <div class="hero-visual">
+            <div class="code-card-3d">
+                <!-- Floating badges -->
+                <div class="floating-badge badge-1">
+                    <i class="fas fa-check-circle" style="color: #22c55e;"></i>
+                    <span>5+ Projets livrés</span>
+                </div>
+                <div class="floating-badge badge-2">
+                    <i class="fas fa-rocket" style="color: var(--cyan);"></i>
+                    <span>Innovation continue</span>
+                </div>
+                <div class="floating-badge badge-3">
+                    <i class="fas fa-users" style="color: var(--purple);"></i>
+                    <span>+10 Clients</span>
+                </div>
+
+                <!-- Main Code Card -->
+                <div class="code-card" id="codeCard3d">
+                    <div class="code-header">
+                        <div class="window-dots">
+                            <span class="window-dot red"></span>
+                            <span class="window-dot yellow"></span>
+                            <span class="window-dot green"></span>
+                        </div>
+                        <span class="code-title">daniel_irenge.py</span>
                     </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title">{{ project.title }}</h5>
-                    <p class="card-text text-muted small">{{ project.description|truncatewords:20 }}</p>
-                    <div class="stars mb-2">
-                        {% with avg=project.average_rating %}
-                            {% for i in "12345"|make_list %}
-                                {% if forloop.counter <= avg %}
-                                    <i class="fas fa-star"></i>
-                                {% elif forloop.counter <= avg|add:0.5 %}
-                                    <i class="fas fa-star-half-alt"></i>
-                                {% else %}
-                                    <i class="far fa-star"></i>
-                                {% endif %}
-                            {% endfor %}
-                            <span class="text-muted small">({{ project.total_ratings }})</span>
-                        {% endwith %}
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <a href="{% url 'project_detail' project.id %}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye me-1"></i>Voir
-                        </a>
-                        <small class="text-muted">
-                            <i class="fas fa-heart text-danger"></i> {{ project.likes.count }}
-                            <i class="fas fa-comment ms-2"></i> {{ project.comments.count }}
-                        </small>
+                    <div class="code-body">
+                        <div><span class="code-keyword">from</span> <span class="code-constant">future</span> <span class="code-keyword">import</span> <span class="code-constant">innovation</span></div>
+                        <div>&nbsp;</div>
+                        <div><span class="code-keyword">class</span> <span class="code-class">DanielIrenge</span>:</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-operator">self</span>):</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-operator">self</span>.<span class="code-constant">name</span> = <span class="code-string">"Daniel Irenge"</span></div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-operator">self</span>.<span class="code-constant">role</span> = <span class="code-string">"Ingénieur Réseaux &amp; Télécoms"</span></div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-operator">self</span>.<span class="code-constant">skills</span> = [</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Python"</span>, <span class="code-string">"Django"</span>,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Networking"</span>, <span class="code-string">"CCNA"</span>,</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Linux"</span>, <span class="code-string">"Cloud"</span></div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-operator">self</span>.<span class="code-constant">status</span> = <span class="code-string">"Disponible"</span>  <span class="code-comment"># 🟢</span></div>
+                        <div>&nbsp;</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">collaborate</span>(<span class="code-operator">self</span>, project):</div>
+                        <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">f"Let's build {project} together!"</span></div>
                     </div>
                 </div>
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center">
-            <p>Aucun projet disponible pour le moment.</p>
+    </section>
+</div>
+
+<!-- FEATURED PROJECTS SECTION -->
+<div class="featured-section">
+    <div class="container">
+        <div class="section-header reveal">
+            <div class="section-subtitle">Portfolio</div>
+            <h2 class="section-title">
+                Mes <span class="highlight">derniers projets</span>
+            </h2>
+            <p style="color: var(--muted); max-width: 500px; margin: 16px auto 0;">
+                Découvrez une sélection de mes réalisations en développement web et infrastructure réseau.
+            </p>
         </div>
-        {% endfor %}
+
+        <div class="projects-grid">
+            {% for project in projects|slice:":3" %}
+            <div class="project-card-home reveal delay-{{ forloop.counter }}">
+                <div class="project-image">
+                    {% if project.image_url %}
+                        <img src="{{ project.image_url }}" alt="{{ project.title }}">
+                    {% else %}
+                        <div style="height: 100%; background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1)); display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-code" style="font-size: 3rem; color: rgba(0,212,255,0.3);"></i>
+                        </div>
+                    {% endif %}
+                    <div class="project-overlay">
+                        <a href="{% url 'project_detail' project.id %}" class="btn-neon primary" style="padding: 8px 20px;">
+                            <i class="fas fa-eye"></i> Détails
+                        </a>
+                    </div>
+                </div>
+                <div class="project-content">
+                    <div class="project-category">
+                        <i class="fas fa-circle" style="font-size: 0.4rem;"></i>
+                        Projet récent
+                    </div>
+                    <h3 class="project-title">{{ project.title }}</h3>
+                    <p class="project-description">{{ project.description|truncatewords:20 }}</p>
+                    
+                    {% if project.technologies %}
+                    <div class="project-tech">
+                        {% for tech in project.technologies.split|slice:":3" %}
+                            <span class="tech-pill">{{ tech }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="project-footer">
+                        <div class="project-stats">
+                            <div class="stat">
+                                <i class="fas fa-heart"></i>
+                                <span>{{ project.likes.count }}</span>
+                            </div>
+                            <div class="stat">
+                                <i class="fas fa-comment"></i>
+                                <span>{{ project.comments.count }}</span>
+                            </div>
+                        </div>
+                        <div class="rating-stars">
+                            {% with avg=project.average_rating %}
+                                {% for i in "12345"|make_list %}
+                                    {% if forloop.counter <= avg %}
+                                        <i class="fas fa-star" style="color: var(--gold); font-size: 0.7rem;"></i>
+                                    {% elif forloop.counter <= avg|add:0.5 %}
+                                        <i class="fas fa-star-half-alt" style="color: var(--gold); font-size: 0.7rem;"></i>
+                                    {% else %}
+                                        <i class="far fa-star" style="color: var(--gold); font-size: 0.7rem;"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center" style="grid-column: 1/-1; padding: 60px;">
+                <i class="fas fa-folder-open" style="font-size: 3rem; color: rgba(0,212,255,0.3); margin-bottom: 20px;"></i>
+                <p style="color: var(--muted);">Aucun projet disponible pour le moment.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if projects %}
+        <div class="view-all-wrapper reveal">
+            <a href="{% url 'project_list' %}" class="btn-neon ghost">
+                <i class="fas fa-th-large"></i> Voir tous les projets
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<!-- SERVICES PREVIEW -->
+<div class="container">
+    <div class="services-preview reveal">
+        <div class="section-header">
+            <div class="section-subtitle">Ce que je fais</div>
+            <h2 class="section-title">
+                Mes <span class="highlight">services</span>
+            </h2>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-item">
+                <div class="service-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3 class="service-title">Développement Web</h3>
+                <p class="service-desc">Applications web sur mesure avec Django, Python, JavaScript et bases de données.</p>
+            </div>
+            <div class="service-item">
+                <div class="service-icon">
+                    <i class="fas fa-network-wired"></i>
+                </div>
+                <h3 class="service-title">Infrastructure Réseau</h3>
+                <p class="service-desc">Conception, déploiement et administration de réseaux d'entreprise.</p>
+            </div>
+            <div class="service-item">
+                <div class="service-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="service-title">Sécurité IT</h3>
+                <p class="service-desc">Audit de sécurité, configuration firewall et protection des données.</p>
+            </div>
+            <div class="service-item">
+                <div class="service-icon">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+                <h3 class="service-title">Formation & Conseil</h3>
+                <p class="service-desc">Formation technique et conseil en transformation digitale.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="container">
+    <div class="cta-banner reveal">
+        <h2 class="cta-title">Vous avez un projet en tête ?</h2>
+        <p class="cta-text">
+            Disponible pour des missions freelance, collaborations et opportunités professionnelles.
+            Ensemble, donnons vie à vos idées.
+        </p>
+        <div class="cta-buttons">
+            <a href="{% url 'contact' %}" class="btn-neon primary">
+                <i class="fas fa-paper-plane"></i> Me contacter
+            </a>
+            <a href="{% url 'service_list' %}" class="btn-neon ghost">
+                <i class="fas fa-cogs"></i> Découvrir mes services
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Typed.js initialization
+var typed = new Typed('#typed-target', {
+    strings: ['Ingénieur Réseaux', 'Développeur Web', 'Architecte Solution', 'Créateur Digital'],
+    typeSpeed: 60,
+    backSpeed: 40,
+    backDelay: 2000,
+    loop: true,
+    cursorChar: '|',
+    contentType: 'html'
+});
+
+// 3D Tilt effect on code card
+const card3d = document.getElementById('codeCard3d');
+const scene = document.querySelector('.code-card-3d');
+
+if (card3d && scene) {
+    scene.addEventListener('mousemove', (e) => {
+        const rect = card3d.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        
+        card3d.style.transform = `
+            perspective(1000px)
+            rotateY(${x * 15}deg)
+            rotateX(${-y * 10}deg)
+            translateY(-5px)
+        `;
+    });
+    
+    scene.addEventListener('mouseleave', () => {
+        card3d.style.transform = '';
+    });
+}
+</script>
 {% endblock %}

@@ -1,14 +1,412 @@
-<h1>Contactez-moi</h1>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Envoyer</button>
-</form>
+{% extends "core/base.html" %}
 
-{% if messages %}
-  <ul>
-    {% for message in messages %}
-      <li style="color:green">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+{% block title %}Contact - Daniel Irenge{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   CONTACT PAGE
+================================================================ */
+.contact-hero {
+    padding: 60px 0 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Section header */
+.contact-header {
+    text-align: center;
+    max-width: 660px;
+    margin: 0 auto 50px;
+}
+
+/* Contact grid */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+@media (max-width: 768px) {
+    .contact-grid { grid-template-columns: 1fr; gap: 30px; }
+}
+
+/* Contact info cards */
+.info-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 32px;
+    transition: border-color 0.3s ease;
+    height: 100%;
+}
+
+.info-card:hover { border-color: rgba(0,212,255,0.2); }
+
+.contact-method {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.contact-method:last-child { border-bottom: none; }
+
+.method-icon {
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1));
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: var(--cyan);
+}
+
+.method-details h4 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--text);
+}
+
+.method-details p, .method-details a {
+    color: var(--muted);
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.method-details a:hover { color: var(--cyan); }
+
+/* Social links in contact */
+.social-grid {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+}
+
+.social-link-card {
+    flex: 1;
+    min-width: 100px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.social-link-card i {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    display: block;
+    color: var(--muted);
+}
+
+.social-link-card span {
+    font-size: 0.75rem;
+    color: var(--muted);
+    display: block;
+}
+
+.social-link-card:hover {
+    border-color: var(--cyan);
+    transform: translateY(-4px);
+}
+
+.social-link-card:hover i,
+.social-link-card:hover span {
+    color: var(--cyan);
+}
+
+/* Form card */
+.form-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 36px;
+    position: relative;
+    overflow: hidden;
+}
+
+.form-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+}
+
+.form-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.form-control {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.9rem;
+    transition: all 0.25s ease;
+}
+
+.form-control:focus {
+    background: rgba(0,0,0,0.4);
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+    color: var(--text);
+    outline: none;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 130px;
+}
+
+/* Custom select for subject */
+.form-select {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.form-select option {
+    background: var(--bg2);
+}
+
+/* Map placeholder */
+.map-placeholder {
+    margin-top: 40px;
+    border-radius: 24px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+/* Availability badge */
+.avail-badge-large {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(34,197,94,0.1);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 60px;
+    padding: 8px 20px;
+    font-size: 0.8rem;
+    color: #22c55e;
+    margin-top: 20px;
+}
+
+.avail-badge-large .pulse-dot {
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+    0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 #22c55e; }
+    50% { opacity: 0.6; transform: scale(1.1); box-shadow: 0 0 0 6px rgba(34,197,94,0); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <!-- Hero -->
+    <section class="contact-hero">
+        <div class="contact-header reveal">
+            <div class="section-label" style="justify-content: center;">04. Contact</div>
+            <h1 class="section-heading">
+                Travaillons <span class="hi">ensemble</span>
+            </h1>
+            <p style="color: var(--muted); max-width: 500px; margin: 16px auto 0;">
+                Une question, un projet, une collaboration ? Je suis à votre écoute.
+                Réponse garantie sous 24 heures.
+            </p>
+        </div>
+
+        <div class="contact-grid">
+            <!-- Left: Contact info -->
+            <div class="reveal delay-1">
+                <div class="info-card">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 24px;">
+                        <i class="fas fa-comment-dots me-2" style="color: var(--cyan);"></i>
+                        Entrons en contact
+                    </h3>
+
+                    <div class="contact-method">
+                        <div class="method-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="method-details">
+                            <h4>Email</h4>
+                            <a href="mailto:irenge.barhasima@ucbukavu.ac.cd">irenge.barhasima@ucbukavu.ac.cd</a>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon"><i class="fab fa-whatsapp"></i></div>
+                        <div class="method-details">
+                            <h4>WhatsApp</h4>
+                            <a href="https://wa.me/243898145014" target="_blank">+243 898 145 014</a>
+                            <p style="font-size: 0.7rem; margin-top: 4px;">Préféré pour les réponses rapides</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon"><i class="fab fa-linkedin"></i></div>
+                        <div class="method-details">
+                            <h4>LinkedIn</h4>
+                            <a href="https://linkedin.com/in/daniel-irenge-barhasima" target="_blank">Daniel Irenge Barhasima</a>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="method-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="method-details">
+                            <h4>Localisation</h4>
+                            <p>Bukavu, République Démocratique du Congo</p>
+                            <p style="font-size: 0.7rem;">Fuseau horaire: CAT (UTC+2)</p>
+                        </div>
+                    </div>
+
+                    <div class="avail-badge-large">
+                        <span class="pulse-dot"></span>
+                        Disponible pour missions, freelances & emploi
+                    </div>
+
+                    <div class="social-grid">
+                        <a href="https://github.com/" class="social-link-card" target="_blank">
+                            <i class="fab fa-github"></i>
+                            <span>GitHub</span>
+                        </a>
+                        <a href="https://twitter.com/" class="social-link-card" target="_blank">
+                            <i class="fab fa-twitter"></i>
+                            <span>Twitter</span>
+                        </a>
+                        <a href="https://www.facebook.com/" class="social-link-card" target="_blank">
+                            <i class="fab fa-facebook"></i>
+                            <span>Facebook</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Form -->
+            <div class="reveal delay-2">
+                <div class="form-card">
+                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 24px;">
+                        <i class="fas fa-paper-plane me-2" style="color: var(--cyan);"></i>
+                        Envoyez-moi un message
+                    </h3>
+
+                    <form method="post" id="contactForm">
+                        {% csrf_token %}
+
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-user me-1"></i> Nom complet
+                            </label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small mt-1">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-envelope me-1"></i> Adresse email
+                            </label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-tag me-1"></i> Sujet
+                            </label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                                <div class="text-danger small mt-1">{{ form.subject.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">
+                                <i class="fas fa-comment me-1"></i> Message
+                            </label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                                <div class="text-danger small mt-1">{{ form.message.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn-neon primary w-100" style="justify-content: center;">
+                            <i class="fas fa-paper-plane"></i> Envoyer le message
+                        </button>
+
+                        <p class="text-center mt-3" style="font-size: 0.7rem; color: var(--muted);">
+                            <i class="fas fa-lock me-1"></i> Vos informations sont confidentielles
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map placeholder (optional) -->
+        <div class="map-placeholder reveal delay-3">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.242531459696!2d28.839165!3d-2.504462!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x19ddb7c8dc353f41%3A0x4c4c4c4c4c4c4c4c!2sBukavu%2C%20RDC!5e0!3m2!1sfr!2s!4v1700000000000!5m2!1sfr!2s" 
+                width="100%" 
+                height="280" 
+                style="border:0; border-radius: 20px;" 
+                allowfullscreen="" 
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </section>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Form submission enhancement
+document.getElementById('contactForm')?.addEventListener('submit', function(e) {
+    const btn = this.querySelector('button[type="submit"]');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+    btn.disabled = true;
+    // Note: The actual submit will happen normally
+    // If there's an error, the page will reload with error messages
+    // This is just visual feedback
+    setTimeout(() => {
+        if (!document.querySelector('.alert-danger')) {
+            btn.innerHTML = '<i class="fas fa-check"></i> Envoyé !';
+        } else {
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer le message';
+            btn.disabled = false;
+        }
+    }, 2000);
+});
+</script>
+{% endblock %}

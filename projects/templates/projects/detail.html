@@ -1,143 +1,1048 @@
 {% extends "core/base.html" %}
 
-{% block title %}{{ project.title }} - Mon Portfolio{% endblock %}
+{% block title %}{{ project.title }} - Daniel Irenge{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   PROJECT DETAIL PAGE
+================================================================ */
+.detail-hero {
+    position: relative;
+    padding: 40px 0 60px;
+    overflow: hidden;
+}
+
+/* Back button */
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 60px;
+    padding: 10px 24px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.25s ease;
+    margin-bottom: 30px;
+}
+
+.back-button:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    transform: translateX(-4px);
+}
+
+/* Project header */
+.project-header {
+    margin-bottom: 40px;
+}
+
+.project-title {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--text), var(--cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.project-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.meta-item i {
+    color: var(--cyan);
+    width: 18px;
+}
+
+/* Main image */
+.project-image-main {
+    border-radius: 28px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    border: 1px solid var(--border);
+    background: linear-gradient(135deg, rgba(0,212,255,0.05), rgba(124,58,237,0.08));
+}
+
+.project-image-main img {
+    width: 100%;
+    max-height: 500px;
+    object-fit: cover;
+}
+
+/* Content grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+@media (max-width: 992px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+}
+
+/* Main content */
+.project-description {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+}
+
+.project-description h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--text);
+}
+
+.project-description .description-text {
+    color: var(--muted);
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.description-text p {
+    margin-bottom: 16px;
+}
+
+/* Tech stack */
+.tech-stack-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.tech-stack-section h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--cyan);
+}
+
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tech-tag {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    color: var(--cyan);
+    transition: all 0.2s;
+}
+
+.tech-tag:hover {
+    background: rgba(0,212,255,0.15);
+    transform: translateY(-2px);
+}
+
+/* Sidebar */
+.project-sidebar {
+    position: sticky;
+    top: 100px;
+}
+
+.sidebar-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.sidebar-card h4 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    margin-bottom: 20px;
+}
+
+/* Rating display */
+.rating-display {
+    text-align: center;
+    padding: 20px;
+    background: rgba(0,212,255,0.05);
+    border-radius: 20px;
+    margin-bottom: 24px;
+}
+
+.rating-stars {
+    font-size: 1.8rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+    margin-bottom: 8px;
+}
+
+.rating-stars .star-half {
+    position: relative;
+    display: inline-block;
+}
+
+.rating-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.rating-count {
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+/* Like button side */
+.like-side {
+    text-align: center;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    margin-bottom: 24px;
+    transition: all 0.25s;
+}
+
+.like-side:hover {
+    border-color: rgba(236,72,153,0.3);
+}
+
+.like-btn-large {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 8px 24px;
+    border-radius: 50px;
+    transition: all 0.25s;
+    color: #ec4899;
+}
+
+.like-btn-large i {
+    font-size: 1.5rem;
+}
+
+.like-btn-large .like-count {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.like-btn-large.liked {
+    background: #ec4899;
+    color: white;
+}
+
+/* Rating form */
+.rating-form-side {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.rating-title {
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    color: var(--muted);
+}
+
+.star-rating-side {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.star-rating-side button {
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--border);
+    transition: all 0.2s;
+}
+
+.star-rating-side button:hover,
+.star-rating-side button.active {
+    color: var(--gold);
+    transform: scale(1.1);
+}
+
+.rating-feedback {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+/* Project actions */
+.project-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+/* Comments section */
+.comments-section {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    margin-top: 40px;
+}
+
+.comments-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.comments-header h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.comments-header h3 i {
+    color: var(--cyan);
+    margin-right: 8px;
+}
+
+.comment-count {
+    background: rgba(0,212,255,0.1);
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    color: var(--cyan);
+}
+
+/* Comment list */
+.comment-list {
+    margin-bottom: 40px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.comment-item {
+    background: rgba(255,255,255,0.02);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+}
+
+.comment-item:hover {
+    background: rgba(0,212,255,0.03);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+}
+
+.comment-author {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.comment-date {
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.comment-content {
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: 0.9rem;
+    margin-left: 52px;
+}
+
+/* Comment form */
+.comment-form {
+    background: rgba(0,0,0,0.2);
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.comment-form h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: var(--cyan);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 576px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.75rem;
+    margin-bottom: 6px;
+    color: var(--muted);
+}
+
+.comment-submit {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none;
+    border-radius: 14px;
+    padding: 12px 28px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    margin-top: 8px;
+}
+
+.comment-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+}
+
+/* Empty comments */
+.empty-comments {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--muted);
+}
+
+.empty-comments i {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    opacity: 0.3;
+}
+
+/* Related projects */
+.related-section {
+    margin-top: 60px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+}
+
+.related-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 28px;
+    text-align: center;
+}
+
+.related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+.related-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s;
+    text-decoration: none;
+}
+
+.related-card:hover {
+    border-color: var(--cyan);
+    transform: translateY(-4px);
+}
+
+.related-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.related-card-content {
+    padding: 16px;
+}
+
+.related-card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.related-card-tech {
+    font-size: 0.7rem;
+    color: var(--cyan);
+}
+
+/* Toast notification */
+.toast-notification {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    background: var(--bg2);
+    border: 1px solid var(--cyan);
+    border-radius: 16px;
+    padding: 14px 24px;
+    color: var(--text);
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.toast-notification.show {
+    transform: translateX(0);
+}
+
+.toast-notification.success {
+    border-color: #22c55e;
+}
+
+.toast-notification.error {
+    border-color: #ef4444;
+}
+</style>
+{% endblock %}
 
 {% block content %}
+
 <div class="container">
-    <!-- Bouton retour -->
-    <div class="mb-3">
-        <a href="{% url 'project_list' %}" class="btn btn-secondary btn-sm">← Retour aux projets</a>
+    <!-- Back button -->
+    <div class="detail-hero">
+        <a href="{% url 'project_list' %}" class="back-button reveal">
+            <i class="fas fa-arrow-left"></i> Retour aux projets
+        </a>
     </div>
-    
-    <!-- Détails du projet -->
-    <div class="card">
-        {% if project.image_url %}
-            <img src="{{ project.image_url }}" class="card-img-top" alt="{{ project.title }}">
-        {% endif %}
-        <div class="card-body">
-            <h1 class="card-title">{{ project.title }}</h1>
-            <p class="card-text">{{ project.description }}</p>
-            <p><strong>Technologies :</strong> {{ project.technologies }}</p>
-            <p><small class="text-muted">Publié le : {{ project.created_at|date:"d/m/Y" }}</small></p>
-            
-            <!-- Affichage de la note moyenne (étoiles) -->
-            <div class="rating-display mb-3">
-                <strong>Note moyenne :</strong>
-                {% for i in full_stars %}★{% endfor %}
-                {% if half_star %}½{% endif %}
-                {% for i in empty_stars %}☆{% endfor %}
-                <span class="text-muted">({{ project.total_ratings }} évaluation{{ project.total_ratings|pluralize }})</span>
+
+    <!-- Project Header -->
+    <div class="project-header reveal">
+        <h1 class="project-title">{{ project.title }}</h1>
+        <div class="project-meta">
+            <div class="meta-item">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Publié le {{ project.created_at|date:"d F Y" }}</span>
             </div>
-            
-            <!-- Likes -->
-            <div class="like-section mb-3">
-                <a href="{% url 'toggle_like_simple' project.id %}" class="btn btn-sm btn-outline-danger">
-                    ❤️ Like <span class="like-count">{{ project.likes.count }}</span>
-                </a>
+            <div class="meta-item">
+                <i class="fas fa-edit"></i>
+                <span>Mis à jour le {{ project.updated_at|date:"d F Y" }}</span>
             </div>
+            {% if project.category %}
+            <div class="meta-item">
+                <i class="fas fa-tag"></i>
+                <span>{{ project.category }}</span>
+            </div>
+            {% endif %}
         </div>
     </div>
-    
-    <!-- ================================================== -->
-    <!-- SECTION ÉVALUATION (NOTES)                        -->
-    <!-- ================================================== -->
-    <div class="card mt-4">
-        <div class="card-header">
-            <h3>Évaluer ce projet</h3>
-        </div>
-        <div class="card-body">
-            <form method="post" action="{% url 'rate_project' project.id %}" class="rating-form">
-                {% csrf_token %}
-                <div class="star-rating mb-3">
-                    <label>Note :</label>
-                    <div class="stars">
-                        {% for i in "12345"|make_list %}
-                            <button type="submit" name="rating" value="{{ i }}" class="star-btn" data-value="{{ i }}">
-                                ☆
-                            </button>
+
+    <!-- Main Image -->
+    {% if project.image_url %}
+    <div class="project-image-main reveal delay-1">
+        <img src="{{ project.image_url }}" alt="{{ project.title }}">
+    </div>
+    {% endif %}
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+        <!-- Main Content -->
+        <div class="reveal delay-2">
+            <div class="project-description">
+                <h3><i class="fas fa-info-circle me-2" style="color: var(--cyan);"></i> Description du projet</h3>
+                <div class="description-text">
+                    {{ project.description|linebreaks }}
+                </div>
+
+                {% if project.technologies %}
+                <div class="tech-stack-section">
+                    <h4><i class="fas fa-code me-2"></i> Technologies utilisées</h4>
+                    <div class="tech-tags">
+                        {% for tech in project.technologies.split %}
+                            <span class="tech-tag">{{ tech }}</span>
                         {% endfor %}
                     </div>
                 </div>
-                <p class="text-muted small">Cliquez sur une étoile pour noter (1 = mauvais, 5 = excellent)</p>
+                {% endif %}
+
+                {% if project.features %}
+                <div class="tech-stack-section">
+                    <h4><i class="fas fa-star me-2"></i> Fonctionnalités</h4>
+                    <ul style="color: var(--muted); line-height: 1.8;">
+                        {% for feature in project.features_list %}
+                            <li><i class="fas fa-check-circle me-2" style="color: var(--cyan);"></i> {{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="project-sidebar reveal delay-3">
+            <!-- Rating Card -->
+            <div class="sidebar-card">
+                <h4><i class="fas fa-star me-2"></i> Évaluation</h4>
+                <div class="rating-display">
+                    <div class="rating-stars">
+                        {% for i in full_stars %}★{% endfor %}
+                        {% if half_star %}½{% endif %}
+                        {% for i in empty_stars %}☆{% endfor %}
+                    </div>
+                    <div class="rating-value">
+                        {{ project.average_rating|floatformat:1 }}
+                        <span class="rating-count">/ 5</span>
+                    </div>
+                    <div class="rating-count">
+                        {{ project.total_ratings }} évaluation{{ project.total_ratings|pluralize }}
+                    </div>
+                </div>
+
+                <!-- Rating Form -->
+                <div class="rating-form-side">
+                    <div class="rating-title">Vous avez testé ce projet ?</div>
+                    <form method="post" action="{% url 'rate_project' project.id %}" class="rating-form-ajax" id="ratingForm">
+                        {% csrf_token %}
+                        <div class="star-rating-side">
+                            {% for i in "54321"|make_list %}
+                            <button type="submit" name="rating" value="{{ i }}" class="star-rate-btn" data-value="{{ i }}">
+                                ☆
+                            </button>
+                            {% endfor %}
+                        </div>
+                        <div class="rating-feedback" id="ratingFeedback"></div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Likes Card -->
+            <div class="sidebar-card">
+                <h4><i class="fas fa-heart me-2" style="color: #ec4899;"></i> Engagement</h4>
+                <div class="like-side">
+                    <div class="like-section" data-object-id="{{ project.id }}" data-model="project">
+                        <button class="like-btn-large {% if user_liked %}liked{% endif %}" id="likeButton">
+                            <i class="fas fa-heart"></i>
+                            <span class="like-count" id="likeCount">{{ project.likes.count }}</span>
+                            <span>J'aime</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Card -->
+            <div class="sidebar-card">
+                <h4><i class="fas fa-link me-2"></i> Actions</h4>
+                <div class="project-actions">
+                    {% if project.project_url %}
+                    <a href="{{ project.project_url }}" class="btn-neon primary" target="_blank" style="flex: 1;">
+                        <i class="fas fa-external-link-alt"></i> Voir le projet
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'contact' %}?project={{ project.id }}" class="btn-neon ghost" style="flex: 1;">
+                        <i class="fas fa-comment"></i> Demander
+                    </a>
+                </div>
+                <div class="mt-3 text-center">
+                    <button class="btn-neon ghost" style="width: 100%;" onclick="shareProject()">
+                        <i class="fas fa-share-alt"></i> Partager
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="comments-section reveal delay-4">
+        <div class="comments-header">
+            <h3>
+                <i class="fas fa-comments"></i> Commentaires
+            </h3>
+            <span class="comment-count" id="commentCount">{{ project.comments.count }}</span>
+        </div>
+
+        <div class="comment-list" id="commentList">
+            {% for comment in project.comments.all %}
+            <div class="comment-item" id="comment-{{ comment.id }}">
+                <div class="comment-header">
+                    <div class="comment-avatar">
+                        {{ comment.author_name|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <span class="comment-author">{{ comment.author_name }}</span>
+                        <span class="comment-date">{{ comment.created_at|date:"d/m/Y à H:i" }}</span>
+                    </div>
+                </div>
+                <div class="comment-content">
+                    {{ comment.content|linebreaks }}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-comments" id="emptyComments">
+                <i class="fas fa-comment-slash"></i>
+                <p>Aucun commentaire pour le moment.</p>
+                <p style="font-size: 0.8rem;">Soyez le premier à donner votre avis !</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Comment Form -->
+        <div class="comment-form">
+            <h4><i class="fas fa-pen-fancy me-2"></i> Laisser un commentaire</h4>
+            <form method="post" action="{% url 'add_comment_simple' 'project' project.id %}" id="commentForm" class="ajax-comment-form">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Votre nom *</label>
+                        <input type="text" name="author_name" id="authorName" required placeholder="Votre nom">
+                    </div>
+                    <div class="form-group">
+                        <label>Votre email *</label>
+                        <input type="email" name="author_email" id="authorEmail" required placeholder="votre email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Votre commentaire *</label>
+                    <textarea name="content" id="commentContent" rows="4" required placeholder="Partagez votre expérience ou posez une question..."></textarea>
+                </div>
+                <button type="submit" class="comment-submit">
+                    <i class="fas fa-paper-plane"></i> Publier le commentaire
+                </button>
             </form>
-            
-            <div id="rating-feedback" class="alert alert-info d-none"></div>
         </div>
     </div>
-    
-    <!-- ================================================== -->
-    <!-- SECTION COMMENTAIRES                               -->
-    <!-- ================================================== -->
-    <div class="card mt-4">
-        <div class="card-header">
-            <h3>Commentaires ({{ project.comments.count }})</h3>
-        </div>
-        <div class="card-body">
-            <div class="comments-list">
-                {% for comment in project.comments.all %}
-                    <div class="border-bottom mb-3 pb-2" id="comment-{{ comment.id }}">
-                        <strong>{{ comment.author_name }}</strong>
-                        <span class="text-muted small">- {{ comment.created_at|date:"d/m/Y H:i" }}</span>
-                        <p class="mt-1">{{ comment.content }}</p>
+
+    <!-- Related Projects -->
+    {% if related_projects %}
+    <div class="related-section reveal">
+        <h3 class="related-title">Projets similaires</h3>
+        <div class="related-grid">
+            {% for related in related_projects %}
+            <a href="{% url 'project_detail' related.id %}" class="related-card">
+                {% if related.image_url %}
+                <img src="{{ related.image_url }}" alt="{{ related.title }}">
+                {% else %}
+                <div style="height: 160px; background: linear-gradient(135deg, var(--cyan-dim), var(--purple-dim)); display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-code" style="font-size: 3rem; color: rgba(0,212,255,0.3);"></i>
+                </div>
+                {% endif %}
+                <div class="related-card-content">
+                    <div class="related-card-title">{{ related.title }}</div>
+                    <div class="related-card-tech">
+                        {% if related.technologies %}
+                            {{ related.technologies|truncatechars:40 }}
+                        {% endif %}
                     </div>
-                {% empty %}
-                    <p class="text-muted">Aucun commentaire pour le moment. Soyez le premier !</p>
-                {% endfor %}
-            </div>
-            
-            <!-- Formulaire d'ajout de commentaire -->
-            <div class="mt-4">
-                <h5>Laisser un commentaire</h5>
-                <form method="post" action="{% url 'add_comment_simple' 'project' project.id %}">
-                    {% csrf_token %}
-                    <div class="mb-2">
-                        <input type="text" name="author_name" class="form-control" placeholder="Votre nom" required>
-                    </div>
-                    <div class="mb-2">
-                        <input type="email" name="author_email" class="form-control" placeholder="Votre email" required>
-                    </div>
-                    <div class="mb-2">
-                        <textarea name="content" class="form-control" rows="3" placeholder="Votre commentaire..." required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Envoyer</button>
-                </form>
-            </div>
+                </div>
+            </a>
+            {% endfor %}
         </div>
     </div>
+    {% endif %}
 </div>
 
-<style>
-/* Style pour les étoiles */
-.stars {
-    display: inline-flex;
-    gap: 10px;
-}
-.star-btn {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #ffc107;
-    transition: transform 0.2s;
-}
-.star-btn:hover {
-    transform: scale(1.2);
-}
-.star-btn[data-value="1"]:hover { color: #ff4444; }
-.star-btn[data-value="2"]:hover { color: #ff8844; }
-.star-btn[data-value="3"]:hover { color: #ffcc44; }
-.star-btn[data-value="4"]:hover { color: #ffee44; }
-.star-btn[data-value="5"]:hover { color: #44ff44; }
-</style>
+<!-- Toast Notification -->
+<div id="toastNotification" class="toast-notification">
+    <i class="fas fa-check-circle me-2"></i>
+    <span id="toastMessage"></span>
+</div>
 
-<style>
-/* Style pour les étoiles d'affichage */
-.rating-display {
-    font-size: 1.5rem;
-    letter-spacing: 2px;
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// CSRF Token
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+// Toast notification
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toastNotification');
+    const toastMessage = document.getElementById('toastMessage');
+    toastMessage.innerHTML = message;
+    toast.className = `toast-notification ${type} show`;
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
 }
-.rating-display span {
-    font-size: 0.9rem;
+
+// ============================================================
+// LIKES AJAX
+// ============================================================
+const likeContainer = document.querySelector('.like-section');
+if (likeContainer) {
+    const likeButton = document.getElementById('likeButton');
+    const likeCountSpan = document.getElementById('likeCount');
+    const objectId = likeContainer.dataset.objectId;
+    const model = likeContainer.dataset.model;
+
+    likeButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        fetch('/api/like/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify({
+                model: model,
+                object_id: objectId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            likeCountSpan.textContent = data.count;
+            if (data.liked) {
+                likeButton.classList.add('liked');
+                showToast('❤️ Vous avez aimé ce projet !', 'success');
+            } else {
+                likeButton.classList.remove('liked');
+                showToast('💔 Like retiré', 'info');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur Like:', error);
+            showToast('Une erreur est survenue', 'error');
+        });
+    });
 }
-</style>
+
+// ============================================================
+// RATING AJAX
+// ============================================================
+document.querySelectorAll('.star-rate-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const rating = this.value;
+        const form = document.getElementById('ratingForm');
+        const formData = new FormData(form);
+        
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update star display
+                const ratingDisplay = document.querySelector('.rating-stars');
+                const ratingValue = document.querySelector('.rating-value');
+                const ratingCount = document.querySelector('.rating-count');
+                
+                ratingValue.innerHTML = data.new_average.toFixed(1) + ' <span class="rating-count">/ 5</span>';
+                ratingCount.innerHTML = data.total_ratings + ' évaluation' + (data.total_ratings > 1 ? 's' : '');
+                
+                // Update stars visual
+                const fullStars = Math.floor(data.new_average);
+                const halfStar = data.new_average % 1 >= 0.5;
+                
+                let starsHtml = '';
+                for (let i = 0; i < fullStars; i++) starsHtml += '★';
+                if (halfStar) starsHtml += '½';
+                for (let i = starsHtml.length - (halfStar ? 1 : 0); i < 5; i++) starsHtml += '☆';
+                
+                ratingDisplay.innerHTML = starsHtml;
+                
+                showToast(`⭐ Merci ! Note de ${rating}/5 enregistrée`, 'success');
+                
+                // Highlight selected stars
+                document.querySelectorAll('.star-rate-btn').forEach(star => {
+                    star.classList.remove('active');
+                    if (parseInt(star.value) <= rating) {
+                        star.classList.add('active');
+                    }
+                });
+            } else {
+                showToast(data.error || 'Erreur lors de la notation', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur Rating:', error);
+            showToast('Une erreur est survenue', 'error');
+        });
+    });
+});
+
+// ============================================================
+// COMMENT AJAX
+// ============================================================
+const commentForm = document.getElementById('commentForm');
+if (commentForm) {
+    commentForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrfToken
+            },
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Add new comment to list
+                const commentList = document.getElementById('commentList');
+                const emptyComments = document.getElementById('emptyComments');
+                
+                // Remove empty state if exists
+                if (emptyComments) {
+                    emptyComments.remove();
+                }
+                
+                // Create new comment element
+                const newComment = document.createElement('div');
+                newComment.className = 'comment-item';
+                newComment.id = `comment-${data.comment_id}`;
+                newComment.innerHTML = `
+                    <div class="comment-header">
+                        <div class="comment-avatar">${data.author_name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <span class="comment-author">${escapeHtml(data.author_name)}</span>
+                            <span class="comment-date">À l'instant</span>
+                        </div>
+                    </div>
+                    <div class="comment-content">${escapeHtml(data.content).replace(/\n/g, '<br>')}</div>
+                `;
+                
+                commentList.insertBefore(newComment, commentList.firstChild);
+                
+                // Update comment count
+                const commentCount = document.getElementById('commentCount');
+                const currentCount = parseInt(commentCount.textContent);
+                commentCount.textContent = currentCount + 1;
+                
+                // Clear form
+                document.getElementById('authorName').value = '';
+                document.getElementById('authorEmail').value = '';
+                document.getElementById('commentContent').value = '';
+                
+                showToast('💬 Commentaire ajouté avec succès !', 'success');
+            } else {
+                showToast(data.error || 'Erreur lors de l\'ajout du commentaire', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Erreur Commentaire:', error);
+            showToast('Une erreur est survenue', 'error');
+        });
+    });
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// ============================================================
+// SHARE FUNCTION
+// ============================================================
+function shareProject() {
+    if (navigator.share) {
+        navigator.share({
+            title: '{{ project.title|escapejs }}',
+            text: 'Découvrez ce projet de Daniel Irenge',
+            url: window.location.href
+        }).catch(() => {});
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            showToast('📋 Lien copié dans le presse-papier !', 'success');
+        });
+    }
+}
+
+// ============================================================
+// STAR HOVER EFFECT
+// ============================================================
+document.querySelectorAll('.star-rate-btn').forEach(star => {
+    star.addEventListener('mouseenter', function() {
+        const value = parseInt(this.value);
+        document.querySelectorAll('.star-rate-btn').forEach((s, index) => {
+            if (parseInt(s.value) <= value) {
+                s.style.color = 'var(--gold)';
+            } else {
+                s.style.color = 'var(--border)';
+            }
+        });
+    });
+    
+    star.addEventListener('mouseleave', function() {
+        document.querySelectorAll('.star-rate-btn').forEach(s => {
+            s.style.color = 'var(--border)';
+            if (s.classList.contains('active')) {
+                s.style.color = 'var(--gold)';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,21 +1,835 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>À propos - Daniel Irenge</title>
-</head>
-<body>
-    <nav>
-        <a href="{% url 'home' %}">Accueil</a> |
-        <a href="{% url 'about' %}">À propos</a> |
-        <a href="{% url 'project_list' %}">Projets</a> |
-        <a href="{% url 'service_list' %}">Services</a> |
-        <a href="{% url 'contact' %}">Contact</a>
-    </nav>
-    
-    <h1>À propos de moi</h1>
-    <div>{{ about_text|safe }}</div>  <!-- safe permet d'interpréter le HTML -->
-    
-    <h2>Compétences techniques</h2>
-    <div>{{ skills|safe }}</div>
-</body>
-</html>
+{% extends "core/base.html" %}
+
+{% block title %}À propos - Daniel Irenge | Ingénieur Réseaux & Télécoms{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ================================================================
+   ABOUT PAGE - ENHANCED STYLES
+================================================================ */
+
+/* Hero section */
+.about-hero {
+    padding: 60px 0 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+}
+
+/* Avatar 3D enhanced */
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
+.avatar-3d-wrapper {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 24px;
+    perspective: 800px;
+}
+
+.avatar-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
+    cursor: pointer;
+}
+
+.avatar-card:hover {
+    transform: rotateY(10deg) rotateX(5deg);
+}
+
+.avatar-front {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15));
+    border: 2px solid rgba(0,212,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    box-shadow: 0 0 40px rgba(0,212,255,0.15);
+    backdrop-filter: blur(4px);
+}
+
+.avatar-front .initials {
+    background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Orbital rings */
+.orbital-ring {
+    position: absolute;
+    inset: -20px;
+    border-radius: 50%;
+    border: 1px dashed rgba(0,212,255,0.25);
+    animation: spinRing 15s linear infinite;
+}
+
+.orbital-ring-2 {
+    position: absolute;
+    inset: -35px;
+    border-radius: 50%;
+    border: 1px dotted rgba(124,58,237,0.2);
+    animation: spinRingReverse 20s linear infinite;
+}
+
+@keyframes spinRing {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes spinRingReverse {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+}
+
+/* Pulse dot on avatar */
+.pulse-dot-avatar {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 18px;
+    height: 18px;
+    background: #22c55e;
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    z-index: 10;
+}
+
+.pulse-dot-avatar::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: pulseRing 2s infinite;
+    opacity: 0.6;
+}
+
+@keyframes pulseRing {
+    0% { transform: scale(1); opacity: 0.6; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+/* Badges section */
+.badge-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.badge-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 60px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    transition: all 0.2s;
+}
+
+.badge-item i {
+    color: var(--cyan);
+    font-size: 0.75rem;
+}
+
+.badge-item:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+    transform: translateY(-2px);
+}
+
+/* Stats grid enhanced */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 32px 0;
+}
+
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    border-color: rgba(0,212,255,0.25);
+    transform: translateY(-5px);
+}
+
+.stat-card:hover::after {
+    transform: scaleX(1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: block;
+}
+
+/* Timeline enhanced */
+.timeline-section {
+    margin-top: 32px;
+}
+
+.timeline-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.timeline-title i {
+    color: var(--cyan);
+    font-size: 1.2rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--cyan), var(--purple), transparent);
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 32px;
+    padding-left: 24px;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -26px;
+    top: 4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 15px var(--cyan);
+    border: 2px solid var(--bg);
+    z-index: 1;
+}
+
+.timeline-year {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--cyan);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+}
+
+.timeline-title-item {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+
+.timeline-desc {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.7;
+}
+
+/* Contact card enhanced */
+.contact-card {
+    background: linear-gradient(135deg, rgba(0,212,255,0.06), rgba(124,58,237,0.06));
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+    margin-top: 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.contact-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+}
+
+.contact-card h5 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* Quick response indicator */
+.response-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34,197,94,0.1);
+    border-radius: 50px;
+    padding: 4px 12px;
+    font-size: 0.7rem;
+    color: #22c55e;
+    margin-top: 16px;
+}
+
+/* Skills section enhanced */
+.skills-section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.skill-progress {
+    margin-bottom: 20px;
+}
+
+.skill-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.skill-name {
+    color: var(--text);
+}
+
+.skill-percent {
+    color: var(--cyan);
+    font-family: 'Fira Code', monospace;
+}
+
+.progress-bar-bg {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    height: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--purple));
+    border-radius: 10px;
+    width: 0;
+    transition: width 1s ease;
+}
+
+/* Fun facts section */
+.fun-facts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.fact-item {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+}
+
+.fact-icon {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}
+
+.fact-icon i {
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.fact-text {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            
+            <!-- Left Column - Identity -->
+            <div class="col-lg-4 text-center reveal">
+                <div class="avatar-container">
+                    <div class="avatar-3d-wrapper">
+                        <div class="avatar-card" id="avatarCard">
+                            <div class="orbital-ring"></div>
+                            <div class="orbital-ring-2"></div>
+                            <div class="avatar-front">
+                                <span class="initials">DI</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pulse-dot-avatar"></div>
+                </div>
+
+                <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 8px;">Daniel Irenge</h2>
+                <p style="background: linear-gradient(135deg, var(--cyan), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; margin-bottom: 20px;">
+                    Ingénieur Réseaux & Télécommunications
+                </p>
+
+                <div class="badge-container">
+                    <span class="badge-item"><i class="fas fa-map-marker-alt"></i> Bukavu, RDC</span>
+                    <span class="badge-item"><i class="fas fa-university"></i> UCB</span>
+                    <span class="badge-item"><i class="fas fa-language"></i> FR / EN / SW</span>
+                </div>
+
+                <!-- Social Links -->
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <a href="https://github.com/" class="social-btn" target="_blank" data-tooltip="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/daniel-irenge-barhasima" class="social-btn" target="_blank" data-tooltip="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://wa.me/243898145014" class="social-btn" target="_blank" data-tooltip="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    <a href="mailto:irenge.barhasima@ucbukavu.ac.cd" class="social-btn" data-tooltip="Email">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Right Column - Info -->
+            <div class="col-lg-8">
+                <div class="section-label reveal">Qui suis-je ?</div>
+                <h1 class="section-heading reveal delay-1">
+                    Bâtir l'avenir<br>
+                    <span class="hi">numérique de l'Afrique</span>
+                </h1>
+                <p class="reveal delay-2" style="color: var(--muted); font-size: 0.95rem; line-height: 1.85;">
+                    Passionné par les technologies de l'information et de la communication, 
+                    je combine expertise en réseau et développement web pour créer des solutions 
+                    innovantes. Mon objectif : contribuer à la transformation digitale de l'Afrique 
+                    à travers des projets à fort impact.
+                </p>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid reveal delay-3">
+                    <div class="stat-card">
+                        <span class="stat-number"><span data-count="3" data-suffix="+">3+</span></span>
+                        <span class="stat-label">Années d'exp.</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number"><span data-count="15" data-suffix="+">15+</span></span>
+                        <span class="stat-label">Projets</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number"><span data-count="10" data-suffix="+">10+</span></span>
+                        <span class="stat-label">Technologies</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number"><span data-count="100" data-suffix="%">100%</span></span>
+                        <span class="stat-label">Satisfaction</span>
+                    </div>
+                </div>
+
+                <!-- CTA Buttons -->
+                <div class="d-flex flex-wrap gap-3 reveal delay-4">
+                    <a href="{% url 'project_list' %}" class="btn-neon primary">
+                        <i class="fas fa-folder-open"></i> Voir mes projets
+                    </a>
+                    <a href="{% url 'contact' %}" class="btn-neon ghost">
+                        <i class="fas fa-paper-plane"></i> Me contacter
+                    </a>
+                    <a href="{% url 'service_list' %}" class="btn-neon ghost">
+                        <i class="fas fa-download"></i> Télécharger CV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Content Section -->
+<section class="about-content">
+    <div class="container">
+        <div class="row g-5">
+            
+            <!-- Left Column - Bio & Timeline -->
+            <div class="col-lg-6">
+                <!-- Bio Card -->
+                <div class="section-label reveal">Biographie</div>
+                <div class="about-text-card reveal delay-1">
+                    <div class="content-inner">
+                        {{ about_text|safe|default:"<p>Je suis Daniel Irenge, ingénieur en réseaux et télécommunications basé à Bukavu, RDC. Titulaire d'une licence en Informatique et Réseaux de l'Université Catholique de Bukavu, je me spécialise dans la conception d'infrastructures réseau robustes et le développement d'applications web modernes.</p><p>Ma passion pour la technologie m'a conduit à travailler sur des projets variés, allant de l'installation de réseaux d'entreprise à la création d'applications web full-stack avec Django. Je crois fermement que la technologie peut être un levier puissant pour le développement en Afrique.</p>" }}
+                    </div>
+                </div>
+
+                <!-- Fun Facts -->
+                <div class="fun-facts reveal delay-2">
+                    <div class="fact-item">
+                        <div class="fact-icon"><i class="fas fa-coffee"></i></div>
+                        <div class="fact-text">Café infini ☕</div>
+                    </div>
+                    <div class="fact-item">
+                        <div class="fact-icon"><i class="fas fa-code-branch"></i></div>
+                        <div class="fact-text">Open Source ❤️</div>
+                    </div>
+                    <div class="fact-item">
+                        <div class="fact-icon"><i class="fas fa-music"></i></div>
+                        <div class="fact-text">Code en musique 🎵</div>
+                    </div>
+                    <div class="fact-item">
+                        <div class="fact-icon"><i class="fas fa-book"></i></div>
+                        <div class="fact-text">Apprentissage continu 📚</div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="timeline-section reveal delay-3">
+                    <div class="timeline-title">
+                        <i class="fas fa-timeline"></i>
+                        <span class="section-label" style="margin: 0;">Parcours professionnel</span>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-year">2025 — Présent</div>
+                            <div class="timeline-title-item">Ingénieur Réseaux & Développeur Web</div>
+                            <div class="timeline-desc">Conception de solutions réseau et développement d'applications web, gestion de projets numériques.</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">2021 — 2025</div>
+                            <div class="timeline-title-item">Université Catholique de Bukavu (UCB)</div>
+                            <div class="timeline-desc">Licence en Informatique et Réseaux de Télécommunications.</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">2024</div>
+                            <div class="timeline-title-item">Certification CCNA</div>
+                            <div class="timeline-desc">Administration réseaux Cisco, routage, commutation, sécurité réseau.</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-year">2023</div>
+                            <div class="timeline-title-item">Stage - Administration Réseau</div>
+                            <div class="timeline-desc">Expérience pratique en configuration et maintenance d'infrastructure réseau.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Card -->
+                <div class="contact-card reveal delay-4">
+                    <h5>💼 Travaillons ensemble</h5>
+                    <p style="color: var(--muted); font-size: 0.85rem; line-height: 1.7;">
+                        Disponible pour des collaborations, missions freelance et opportunités professionnelles.
+                    </p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="mailto:irenge.barhasima@ucbukavu.ac.cd" class="btn-neon primary" style="padding: 8px 20px;">
+                            <i class="fas fa-envelope"></i> Email
+                        </a>
+                        <a href="https://wa.me/243898145014" class="btn-neon ghost" target="_blank" style="padding: 8px 20px;">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </a>
+                    </div>
+                    <div class="response-time">
+                        <i class="fas fa-clock"></i>
+                        <span>Réponse garantie sous 24h</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Skills -->
+            <div class="col-lg-6">
+                <!-- Technical Skills -->
+                <div class="section-label reveal">Compétences</div>
+                
+                <div class="skills-card reveal delay-1">
+                    <div class="skills-section-title">
+                        <i class="fas fa-terminal" style="color: var(--cyan);"></i>
+                        <h5 style="margin: 0; font-weight: 700;">Compétences techniques</h5>
+                    </div>
+                    
+                    <div class="skills-django-wrap">
+                        {{ skills|safe|default:"
+                        <div class='skill-progress'>
+                            <div class='skill-info'><span class='skill-name'>Python / Django</span><span class='skill-percent'>90%</span></div>
+                            <div class='progress-bar-bg'><div class='progress-fill' style='width: 90%;'></div></div>
+                        </div>
+                        <div class='skill-progress'>
+                            <div class='skill-info'><span class='skill-name'>Réseaux (CCNA)</span><span class='skill-percent'>85%</span></div>
+                            <div class='progress-bar-bg'><div class='progress-fill' style='width: 85%;'></div></div>
+                        </div>
+                        <div class='skill-progress'>
+                            <div class='skill-info'><span class='skill-name'>JavaScript / HTML / CSS</span><span class='skill-percent'>80%</span></div>
+                            <div class='progress-bar-bg'><div class='progress-fill' style='width: 80%;'></div></div>
+                        </div>
+                        <div class='skill-progress'>
+                            <div class='skill-info'><span class='skill-name'>Linux / Administration</span><span class='skill-percent'>85%</span></div>
+                            <div class='progress-bar-bg'><div class='progress-fill' style='width: 85%;'></div></div>
+                        </div>
+                        <div class='skill-progress'>
+                            <div class='skill-info'><span class='skill-name'>Base de données (SQL)</span><span class='skill-percent'>80%</span></div>
+                            <div class='progress-bar-bg'><div class='progress-fill' style='width: 80%;'></div></div>
+                        </div>
+                        " }}
+                    </div>
+                </div>
+
+                <!-- Tech Stack -->
+                <div class="skills-card reveal delay-2" style="margin-top: 24px;">
+                    <div class="skills-section-title">
+                        <i class="fas fa-layer-group" style="color: var(--purple);"></i>
+                        <h5 style="margin: 0; font-weight: 700;">Stack technique</h5>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-label">Développement</div>
+                        <div>
+                            <span class="skill-badge"><i class="fab fa-python"></i> Python</span>
+                            <span class="skill-badge">Django</span>
+                            <span class="skill-badge"><i class="fab fa-html5"></i> HTML5</span>
+                            <span class="skill-badge"><i class="fab fa-css3-alt"></i> CSS3</span>
+                            <span class="skill-badge"><i class="fab fa-js"></i> JavaScript</span>
+                            <span class="skill-badge">Bootstrap 5</span>
+                            <span class="skill-badge">Tailwind</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-label">Réseaux & Systèmes</div>
+                        <div>
+                            <span class="skill-badge">CCNA</span>
+                            <span class="skill-badge"><i class="fab fa-linux"></i> Linux</span>
+                            <span class="skill-badge">TCP/IP</span>
+                            <span class="skill-badge">VoIP</span>
+                            <span class="skill-badge">Cisco IOS</span>
+                            <span class="skill-badge">Wireshark</span>
+                            <span class="skill-badge">VLAN</span>
+                            <span class="skill-badge">DNS/DHCP</span>
+                        </div>
+                    </div>
+
+                    <div class="skill-group">
+                        <div class="skill-group-label">Bases de données & Outils</div>
+                        <div>
+                            <span class="skill-badge">PostgreSQL</span>
+                            <span class="skill-badge">MySQL</span>
+                            <span class="skill-badge">SQLite</span>
+                            <span class="skill-badge"><i class="fab fa-git-alt"></i> Git</span>
+                            <span class="skill-badge">Docker</span>
+                            <span class="skill-badge">VS Code</span>
+                            <span class="skill-badge">Packet Tracer</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- What I bring -->
+                <div class="skills-card reveal delay-3" style="margin-top: 24px;">
+                    <div class="skills-section-title">
+                        <i class="fas fa-star" style="color: var(--gold);"></i>
+                        <h5 style="margin: 0; font-weight: 700;">Ce que j'apporte</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="service-value-card">
+                                <i class="fas fa-network-wired"></i>
+                                <div>Infrastructure Réseau</div>
+                                <small>Design & administration</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="service-value-card">
+                                <i class="fas fa-globe"></i>
+                                <div>Applications Web</div>
+                                <small>Django · Full-stack</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="service-value-card">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>Sécurité Réseau</div>
+                                <small>Audit & protection</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="service-value-card">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                                <div>Formation & Conseil</div>
+                                <small>Tech & numérique</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications -->
+                <div class="skills-card reveal delay-4" style="margin-top: 24px;">
+                    <div class="skills-section-title">
+                        <i class="fas fa-certificate" style="color: var(--gold);"></i>
+                        <h5 style="margin: 0; font-weight: 700;">Certifications</h5>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+                        <span class="cert-badge"><i class="fas fa-check-circle"></i> CCNA (Cisco)</span>
+                        <span class="cert-badge"><i class="fas fa-check-circle"></i> Python Institute PCEP</span>
+                        <span class="cert-badge"><i class="fas fa-check-circle"></i> Linux Essentials</span>
+                        <span class="cert-badge"><i class="fas fa-check-circle"></i> Django Developer</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Additional styles for about page */
+.service-value-card {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(0,212,255,0.03);
+    text-align: center;
+    transition: all 0.25s;
+}
+
+.service-value-card:hover {
+    border-color: var(--cyan);
+    transform: translateY(-3px);
+}
+
+.service-value-card i {
+    font-size: 1.3rem;
+    color: var(--cyan);
+    margin-bottom: 8px;
+    display: inline-block;
+}
+
+.service-value-card div {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.service-value-card small {
+    font-size: 0.7rem;
+    color: var(--muted);
+}
+
+.cert-badge {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 30px;
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    color: var(--cyan);
+}
+
+.cert-badge i {
+    margin-right: 6px;
+    color: var(--gold);
+}
+</style>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Avatar 3D mouse follow
+const avatarCard = document.getElementById('avatarCard');
+if (avatarCard) {
+    document.addEventListener('mousemove', (e) => {
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const rx = ((e.clientY - cy) / cy) * -15;
+        const ry = ((e.clientX - cx) / cx) * 15;
+        avatarCard.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+}
+
+// Animate progress bars on scroll
+const progressObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const fills = entry.target.querySelectorAll('.progress-fill');
+            fills.forEach(fill => {
+                const width = fill.style.width;
+                if (width && width !== '0%') {
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 100);
+                }
+            });
+            progressObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.skills-card').forEach(card => {
+    progressObserver.observe(card);
+});
+</script>
+{% endblock %}
