@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-t5c6l^ilp@4fi9pi@h&(p6t03h5g2&hwckiaqoe*600@viaphd
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Pour production (décommentez quand vous déployez)
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = [
      'techbridgesolutionibd.onrender.com',
      '.onrender.com',  # Accepte tous les sous-domaines render.com
