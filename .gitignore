@@ -1,0 +1,43 @@
+# Environnement Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Base de données SQLite (locale)
+db.sqlite3
+*.sqlite3
+
+# Fichiers statiques et médias (générés)
+staticfiles/
+static/
+media/
+*.log
+
+# Fichiers spécifiques à l'IDE/éditeur
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers de secrets / variables d’environnement (si tu en as)
+.env
+*.env
+
+# Fichiers propres à Django (déprécié)
+*.pid
+
+# Fichiers de migration (optionnel, souvent on les garde mais tu peux les ajouter si tu veux)
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Fichiers de configuration spécifiques à Render ou déploiement
+*.bak
+.DS_Store (macOS) / Thumbs.db (Windows)
+

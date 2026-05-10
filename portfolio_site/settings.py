@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-t5c6l^ilp@4fi9pi@h&(p6t03h5g2&hwckiaqoe*600@viaphd
 #ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Pour production (décommentez quand vous déployez)
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = [
      'techbridgesolutionibd.onrender.com',
      '.onrender.com',  # Accepte tous les sous-domaines render.com
@@ -27,6 +27,8 @@ ALLOWED_HOSTS = [
 
 # Application definition
 INSTALLED_APPS = [
+    'admin_interface',
+    'colorfield',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,10 +40,14 @@ INSTALLED_APPS = [
     'services',
     'contact',
 ]
+# Admin interface theme
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+ADMIN_INTERFACE_THEME = 'django-admin-interface'  # thème par défaut moderne
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
