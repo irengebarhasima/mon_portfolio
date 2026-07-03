@@ -107,14 +107,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # À ajouter à la fin de settings.py (après avoir testé)
 
 # Configuration pour Render (optionnel, après test)
+# Configuration pour Render et PostgreSQL
 import dj_database_url
 
+# On récupère la variable d'environnement de Render
 DATABASE_URL = os.environ.get('DATABASE_URL')
+
 if DATABASE_URL:
-    DATABASES['default'] = dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    # dj_database_url.parse analyse directement l'URL fournie par Render
+    DATABASES['default'] = dj_database_url.parse(DATABASE_URL)
+    
+    # Sécurité additionnelle pour la connexion
+    DATABASES['default']['CONN_MAX_AGE'] = 600
+    
+    # Vos réglages de production
     DEBUG = False
-    ALLOWED_HOSTS = ['.onrender.com', 'localhost']
+    ALLOWED_HOSTS = [
+        'techbridgesolutionibd.onrender.com',
+        '.onrender.com',
+        'localhost',
+        '127.0.0.1',
+    ]
